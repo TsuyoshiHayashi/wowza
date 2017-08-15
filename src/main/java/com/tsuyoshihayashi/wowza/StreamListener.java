@@ -4,7 +4,6 @@ import com.tsuyoshihayashi.model.RecordSettings;
 import com.wowza.wms.application.IApplication;
 import com.wowza.wms.application.IApplicationInstance;
 import com.wowza.wms.application.WMSProperties;
-import com.wowza.wms.livestreamrecord.manager.ILiveStreamRecordManager;
 import com.wowza.wms.livestreamrecord.manager.IStreamRecorderConstants;
 import com.wowza.wms.livestreamrecord.manager.StreamRecorderParameters;
 import com.wowza.wms.logging.WMSLogger;
@@ -17,6 +16,7 @@ import org.json.simple.parser.JSONParser;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
+import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 /**
@@ -25,7 +25,6 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 final class StreamListener extends MediaStreamActionNotifyBase {
     private static final String API_ENDPOINT_KEY = "apiEndpoint";
     private static final String API_STREAM_NAME_PARAMETER_NAME = "n";
-    private static final String RECORD_SETTINGS_KEY = "RECORD_SETTINGS";
 
     private final WMSLogger logger = WMSLoggerFactory.getLogger(StreamListener.class);
     private final JSONParser parser = new JSONParser();
@@ -41,7 +40,9 @@ final class StreamListener extends MediaStreamActionNotifyBase {
 
         final IApplication application = instance.getApplication();
         final WMSProperties properties = application.getProperties();
-        this.apiEndpoint = properties.getPropertyStr(API_ENDPOINT_KEY);
+        this.apiEndpoint = "http://www.videog.jp/system/api/ajax/w4/wowza_api_sample.php";//properties.getPropertyStr(API_ENDPOINT_KEY);
+
+        logger.info(String.format("API Endpoint: %s", apiEndpoint));
     }
 
     private RecordSettings getRecordSettings(IMediaStream stream) {
@@ -52,8 +53,11 @@ final class StreamListener extends MediaStreamActionNotifyBase {
                 .get(String.class);
 
             final JSONObject response = (JSONObject) parser.parse(responseText);
+            final RecordSettings settings = new RecordSettings(response);
 
-            return new RecordSettings(response);
+            logger.info(String.format("Record settings: name '%s', split on %d minutes, upload to %s", settings.getFileNameFormat(), settings.getLimit(), settings.getUploadURL()));
+
+            return settings;
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -66,27 +70,24 @@ final class StreamListener extends MediaStreamActionNotifyBase {
     @Override
     public void onPublish(IMediaStream stream, String name, boolean record, boolean append) {
         completedFuture(stream)
-            .thenApplyAsync(this::getRecordSettings)
-            .thenAcceptAsync(settings -> {
+            .thenApply(this::getRecordSettings)
+            .thenAccept(settings -> {
                 stream.getProperties().setProperty(RECORD_SETTINGS_KEY, settings);
 
-                final ILiveStreamRecordManager manager = instance.getVHost().getLiveStreamRecordManager();
                 final StreamRecorderParameters parameters = new StreamRecorderParameters(instance);
                 parameters.fileFormat = IStreamRecorderConstants.FORMAT_MP4;
                 parameters.segmentationType = IStreamRecorderConstants.SEGMENT_BY_DURATION;
-                parameters.segmentDuration = settings.getLimit();
+                parameters.segmentDuration = settings.getLimit() * 60 * 1000;
                 parameters.startOnKeyFrame = true;
                 parameters.recordData = true;
                 parameters.outputPath = instance.getStreamStoragePath();
-                // TODO: File name format
 
-                manager.startRecording(instance, name, parameters);
+                instance.getVHost().getLiveStreamRecordManager().startRecording(instance, name, parameters);
             });
     }
 
     @Override
     public void onUnPublish(IMediaStream stream, String name, boolean record, boolean append) {
-        final ILiveStreamRecordManager manager = instance.getVHost().getLiveStreamRecordManager();
-        manager.stopRecording(instance, name);
+        instance.getVHost().getLiveStreamRecordManager().stopRecording(instance, name);
     }
 }

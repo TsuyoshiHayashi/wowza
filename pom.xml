@@ -37,6 +37,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
@@ -47,6 +53,11 @@
             <artifactId>javax.ws.rs-api</artifactId>
             <version>2.0.1</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>2.1</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
@@ -80,7 +91,7 @@
                         <fileset>
                             <directory>${project.deploy.dir}</directory>
                             <includes>
-                                <include>$.jar</include>
+                                <include>*.jar</include>
                             </includes>
                         </fileset>
                     </filesets>
@@ -109,7 +120,6 @@
                             <outputDirectory>${project.deploy.dir}</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
-                            <includeScope>compile</includeScope>
                             <excludeScope>provided</excludeScope>
                         </configuration>
                     </execution>
