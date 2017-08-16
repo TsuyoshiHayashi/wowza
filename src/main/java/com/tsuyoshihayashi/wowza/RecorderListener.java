@@ -43,7 +43,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
         final RecordSettings settings = streamRecordSettings.get(recorder.getStreamName());
 
         final DateTime end = new DateTime();
-        final DateTime start = end.minus(recorder.getCurrentDuration());
+        final DateTime start = end.minus(recorder.getSegmentDuration());
 
         final File oldFile = new File(recorder.getCurrentFile());
         final String newFileName = settings.getFileNameFormat()
