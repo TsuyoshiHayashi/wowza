@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 /**
  * @author Alexey Donov
@@ -38,26 +39,11 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
             .build();
     }
 
-    @Override
-    public void onStartRecorder(IStreamRecorder recorder) {
-        final IMediaStream stream = recorder.getStream();
-        if (stream == null) {
-            logger.warn("No recorder stream");
-            return;
-        }
-
-        final WMSProperties properties = stream.getProperties();
-        final RecordSettings settings = (RecordSettings) properties.getProperty(RECORD_SETTINGS_KEY);
-
-        streamRecordSettings.put(recorder.getStreamName(), settings);
-    }
-
-    @Override
-    public void onSegmentEnd(IStreamRecorder recorder) {
+    private void renameAndUpload(IStreamRecorder recorder) {
         final RecordSettings settings = streamRecordSettings.get(recorder.getStreamName());
 
-        final DateTime start = recorder.getStartTime();
         final DateTime end = new DateTime();
+        final DateTime start = end.minus(recorder.getCurrentDuration());
 
         final File oldFile = new File(recorder.getCurrentFile());
         final String newFileName = settings.getFileNameFormat()
@@ -85,17 +71,45 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
 
             logger.info(String.format("Uploading %s to %s", newFile.getName(), settings.getUploadURL()));
 
-            final String response = client.target(settings.getUploadURL())
-                .request()
-                .post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE))
-                .readEntity(String.class);
-            logger.info(String.format("Upload response: %s", response));
-
-            if (!newFile.delete()) {
-                logger.warn(String.format("Couldn't delete %s", newFile.getAbsolutePath()));
+            try {
+                final String response = client.target(settings.getUploadURL())
+                    .request()
+                    .post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE))
+                    .readEntity(String.class);
+                logger.info(String.format("Upload response: %s", response));
+                if (!newFile.delete()) {
+                    logger.warn(String.format("Couldn't delete %s", newFile.getAbsolutePath()));
+                }
+            } catch (Exception e) {
+                logger.error(e);
             }
         } else {
             logger.warn("Couldn't move");
         }
+    }
+
+    @Override
+    public void onStartRecorder(IStreamRecorder recorder) {
+        final IMediaStream stream = recorder.getStream();
+        if (stream == null) {
+            logger.warn("No recorder stream");
+            return;
+        }
+
+        final WMSProperties properties = stream.getProperties();
+        final RecordSettings settings = (RecordSettings) properties.getProperty(RECORD_SETTINGS_KEY);
+
+        streamRecordSettings.put(recorder.getStreamName(), settings);
+    }
+
+    @Override
+    public void onStopRecorder(IStreamRecorder recorder) {
+        streamRecordSettings.remove(recorder.getStreamName());
+    }
+
+    @Override
+    public void onSegmentEnd(IStreamRecorder recorder) {
+        completedFuture(recorder)
+            .thenAcceptAsync(this::renameAndUpload);
     }
 }

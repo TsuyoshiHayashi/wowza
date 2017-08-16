@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * @author Alexey Donov
  */
-public class Module extends ModuleBase implements IModuleOnApp, IModuleOnStream {
+public final class Module extends ModuleBase implements IModuleOnApp, IModuleOnStream {
     private @Nullable StreamListener streamListener = null;
     private final @NotNull RecordManagerListener recordManagerListener = new RecordManagerListener();
 

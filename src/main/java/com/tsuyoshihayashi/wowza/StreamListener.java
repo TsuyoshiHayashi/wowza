@@ -1,9 +1,7 @@
 package com.tsuyoshihayashi.wowza;
 
 import com.tsuyoshihayashi.model.RecordSettings;
-import com.wowza.wms.application.IApplication;
 import com.wowza.wms.application.IApplicationInstance;
-import com.wowza.wms.application.WMSProperties;
 import com.wowza.wms.livestreamrecord.manager.IStreamRecorderConstants;
 import com.wowza.wms.livestreamrecord.manager.StreamRecorderParameters;
 import com.wowza.wms.logging.WMSLogger;
@@ -37,10 +35,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
         super();
 
         this.instance = instance;
-
-        final IApplication application = instance.getApplication();
-        final WMSProperties properties = application.getProperties();
-        this.apiEndpoint = "http://www.videog.jp/system/api/ajax/w4/wowza_api_sample.php";//properties.getPropertyStr(API_ENDPOINT_KEY);
+        this.apiEndpoint = instance.getProperties().getPropertyStr(API_ENDPOINT_KEY);
 
         logger.info(String.format("API Endpoint: %s", apiEndpoint));
     }

@@ -21,7 +21,7 @@ public final class RecordSettings {
         super();
 
         if (!Stream.of(FILE_NAME_FORMAT_KEY, LIMIT_KEY, UPLOAD_URL_KEY, HASH_KEY, HASH2_KEY).parallel().allMatch(json::containsKey)) {
-            throw new RuntimeException("Missing key(s)");
+            throw new RuntimeException(String.format("Missing key(s) in %s", json.toJSONString()));
         }
 
         this.json = json;
