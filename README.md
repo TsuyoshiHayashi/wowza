@@ -25,6 +25,11 @@
                     <Value>http://www.videog.jp/system/api/ajax/w4/wowza_api_sample.php</Value>
                     <Type>String</Type>
                 </Property>
+                <Property>
+                    <Name>uploadReferer</Name>
+                    <Value>http://logic-design.jp/</Value>
+                    <Type>String</Type>
+                </Property>
                 ...
             </Properties>
             ...        
