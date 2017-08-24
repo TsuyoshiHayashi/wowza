@@ -16,8 +16,9 @@ public final class RecordSettings {
     private static final String HASH2_KEY = "hash2";
 
     private final @NotNull JSONObject json;
+    private final @NotNull String referer;
 
-    public RecordSettings(@NotNull JSONObject json) {
+    public RecordSettings(@NotNull JSONObject json, @NotNull String referer) {
         super();
 
         if (!Stream.of(FILE_NAME_FORMAT_KEY, LIMIT_KEY, UPLOAD_URL_KEY, HASH_KEY, HASH2_KEY).parallel().allMatch(json::containsKey)) {
@@ -25,6 +26,7 @@ public final class RecordSettings {
         }
 
         this.json = json;
+        this.referer = referer;
     }
 
     public String getFileNameFormat() {
@@ -45,5 +47,9 @@ public final class RecordSettings {
 
     public String getHash2() {
         return json.get(HASH2_KEY).toString();
+    }
+
+    public @NotNull String getReferer() {
+        return referer;
     }
 }

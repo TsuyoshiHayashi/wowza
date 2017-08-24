@@ -27,6 +27,8 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
  * @author Alexey Donov
  */
 final class RecorderListener extends StreamRecorderActionNotifyBase {
+    private static final boolean USE_TEST_ENDPOINT = true;
+
     private final WMSLogger logger = WMSLoggerFactory.getLogger(RecorderListener.class);
 
     private final Client client;
@@ -69,11 +71,17 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
             form.field("comment", "");
             form.bodyPart(new FileDataBodyPart("video_file", newFile, new MediaType("video", "mp4")));
 
-            logger.info(String.format("Uploading %s to %s", newFile.getName(), settings.getUploadURL()));
+            String endpoint = settings.getUploadURL();
+            if (USE_TEST_ENDPOINT) {
+                endpoint = endpoint.replace("upload_api.php", "upload_api_test.php");
+            }
+
+            logger.info(String.format("Uploading %s to %s", newFile.getName(), endpoint));
 
             try {
                 final String response = client.target(settings.getUploadURL())
                     .request()
+                    .header("Referer", settings.getReferer())
                     .post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE))
                     .readEntity(String.class);
                 logger.info(String.format("Upload response: %s", response));

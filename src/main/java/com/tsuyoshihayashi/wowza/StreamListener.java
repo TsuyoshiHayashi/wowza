@@ -2,6 +2,7 @@ package com.tsuyoshihayashi.wowza;
 
 import com.tsuyoshihayashi.model.RecordSettings;
 import com.wowza.wms.application.IApplicationInstance;
+import com.wowza.wms.application.WMSProperties;
 import com.wowza.wms.livestreamrecord.manager.IStreamRecorderConstants;
 import com.wowza.wms.livestreamrecord.manager.StreamRecorderParameters;
 import com.wowza.wms.logging.WMSLogger;
@@ -22,6 +23,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
  */
 final class StreamListener extends MediaStreamActionNotifyBase {
     private static final String API_ENDPOINT_KEY = "apiEndpoint";
+    private static final String UPLOAD_REFERER_KEY = "uploadReferer";
     private static final String API_STREAM_NAME_PARAMETER_NAME = "n";
 
     private final WMSLogger logger = WMSLoggerFactory.getLogger(StreamListener.class);
@@ -30,12 +32,17 @@ final class StreamListener extends MediaStreamActionNotifyBase {
 
     private final IApplicationInstance instance;
     private final String apiEndpoint;
+    private final String uploadReferer;
 
     StreamListener(IApplicationInstance instance) {
         super();
 
         this.instance = instance;
-        this.apiEndpoint = instance.getProperties().getPropertyStr(API_ENDPOINT_KEY);
+
+        final WMSProperties properties = instance.getProperties();
+
+        this.apiEndpoint = properties.getPropertyStr(API_ENDPOINT_KEY);
+        this.uploadReferer = properties.getPropertyStr(UPLOAD_REFERER_KEY, "");
 
         logger.info(String.format("API Endpoint: %s", apiEndpoint));
     }
@@ -48,7 +55,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
                 .get(String.class);
 
             final JSONObject response = (JSONObject) parser.parse(responseText);
-            final RecordSettings settings = new RecordSettings(response);
+            final RecordSettings settings = new RecordSettings(response, uploadReferer);
 
             logger.info(String.format("Record settings: name '%s', split on %d minutes, upload to %s", settings.getFileNameFormat(), settings.getLimit(), settings.getUploadURL()));
 
