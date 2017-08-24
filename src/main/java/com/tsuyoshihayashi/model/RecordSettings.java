@@ -15,38 +15,46 @@ public final class RecordSettings {
     private static final String HASH_KEY = "hash";
     private static final String HASH2_KEY = "hash2";
 
-    private final @NotNull JSONObject json;
+    private final @NotNull String fileNameFormat;
+    private final long limit;
+    private final @NotNull String uploadURL;
+    private final @NotNull String hash;
+    private final @NotNull String hash2;
     private final @NotNull String referer;
 
-    public RecordSettings(@NotNull JSONObject json, @NotNull String referer) {
+    public RecordSettings(@NotNull String fileNameFormat, long limit, @NotNull String uploadURL, @NotNull String hash, @NotNull String hash2, @NotNull String referer) {
         super();
 
-        if (!Stream.of(FILE_NAME_FORMAT_KEY, LIMIT_KEY, UPLOAD_URL_KEY, HASH_KEY, HASH2_KEY).parallel().allMatch(json::containsKey)) {
-            throw new RuntimeException(String.format("Missing key(s) in %s", json.toJSONString()));
-        }
-
-        this.json = json;
+        this.fileNameFormat = fileNameFormat;
+        this.limit = limit;
+        this.uploadURL = uploadURL;
+        this.hash = hash;
+        this.hash2 = hash2;
         this.referer = referer;
     }
 
-    public String getFileNameFormat() {
-        return json.get(FILE_NAME_FORMAT_KEY).toString();
+    public RecordSettings(@NotNull JSONObject json, @NotNull String referer) {
+        this(json.get(FILE_NAME_FORMAT_KEY).toString(), Long.parseLong(json.get(LIMIT_KEY).toString()), json.get(UPLOAD_URL_KEY).toString(), json.get(HASH_KEY).toString(), json.get(HASH2_KEY).toString(), referer);
+    }
+
+    public @NotNull String getFileNameFormat() {
+        return fileNameFormat;
     }
 
     public long getLimit() {
-        return Long.parseLong(json.get(LIMIT_KEY).toString());
+        return limit;
     }
 
-    public String getUploadURL() {
-        return json.get(UPLOAD_URL_KEY).toString();
+    public @NotNull String getUploadURL() {
+        return uploadURL;
     }
 
-    public String getHash() {
-        return json.get(HASH_KEY).toString();
+    public @NotNull String getHash() {
+        return hash;
     }
 
-    public String getHash2() {
-        return json.get(HASH2_KEY).toString();
+    public @NotNull String getHash2() {
+        return hash2;
     }
 
     public @NotNull String getReferer() {
