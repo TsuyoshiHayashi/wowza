@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.concurrent.CompletableFuture.runAsync;
 
 /**
  * @author Alexey Donov
@@ -48,7 +49,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
     }
 
     static String createNewName(RecordSettings recordSettings, SegmentInfo segmentInfo) {
-        final DateTime end = new DateTime();
+        final DateTime end = segmentInfo.getSegmentEndTime();
         final DateTime start = end.minus(segmentInfo.getSegmentDuration());
 
         final String newName = recordSettings.getFileNameFormat()
@@ -88,12 +89,18 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
             endpoint = endpoint.replace("upload_api.php", "upload_api_test.php");
         }
 
+        logger.info(String.format("Uploading segment %s to %s", file.getName(), endpoint));
+
         try {
-            return client.target(endpoint)
+            final String response = client.target(endpoint)
                 .request()
                 .header("Referer", settings.getReferer())
                 .post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE))
                 .readEntity(String.class);
+            if (!file.delete()) {
+                logger.warn(String.format("Could not delete %s", file));
+            }
+            return response;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -120,12 +127,17 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
 
     @Override
     public void onSegmentEnd(IStreamRecorder recorder) {
-        final CompletableFuture<IStreamRecorder> recorderFuture = completedFuture(recorder);
-        final CompletableFuture<RecordSettings> recordSettingsFuture = recorderFuture.thenApplyAsync(RecorderListener::getRecordSettings);
-        final CompletableFuture<SegmentInfo> segmentInfoFuture = recorderFuture.thenApplyAsync(RecorderListener::getSegmentInfo);
-        final CompletableFuture<File> oldFileFuture = segmentInfoFuture.thenApplyAsync(RecorderListener::getRecordedFile);
-        final CompletableFuture<String> newFileNameFuture = recordSettingsFuture.thenCombineAsync(segmentInfoFuture, RecorderListener::createNewName);
-        final CompletableFuture<File> newFileFuture = oldFileFuture.thenCombineAsync(newFileNameFuture, RecorderListener::renameFile);
+        final SegmentInfo segmentInfo = getSegmentInfo(recorder);
+        final CompletableFuture<SegmentInfo> segmentInfoFuture = completedFuture(segmentInfo);
+
+        final RecordSettings recordSettings = getRecordSettings(recorder);
+        final CompletableFuture<RecordSettings> recordSettingsFuture = completedFuture(recordSettings);
+
+        runAsync(() -> logger.info("Segment finished"));
+
+        final CompletableFuture<File> oldFileFuture = segmentInfoFuture.thenApply(RecorderListener::getRecordedFile);
+        final CompletableFuture<String> newFileNameFuture = recordSettingsFuture.thenCombine(segmentInfoFuture, RecorderListener::createNewName);
+        final CompletableFuture<File> newFileFuture = oldFileFuture.thenCombine(newFileNameFuture, RecorderListener::renameFile);
         newFileFuture.thenCombineAsync(recordSettingsFuture, RecorderListener::uploadFile)
             .thenAcceptAsync(response -> logger.info(String.format("Upload response: %s", response)));
     }

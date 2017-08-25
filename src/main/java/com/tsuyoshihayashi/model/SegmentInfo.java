@@ -1,19 +1,22 @@
 package com.tsuyoshihayashi.model;
 
 import com.wowza.wms.livestreamrecord.manager.IStreamRecorder;
+import org.joda.time.DateTime;
 
 /**
  * @author Alexey Donov
  */
 public final class SegmentInfo {
+    private final DateTime segmentEndTime;
     private final long segmentDuration;
     private final int segmentNumber;
     private final String storagePath;
     private final String currentFile;
 
-    public SegmentInfo(long segmentDuration, int segmentNumber, String storagePath, String currentFile) {
+    public SegmentInfo(DateTime segmentEndTime, long segmentDuration, int segmentNumber, String storagePath, String currentFile) {
         super();
 
+        this.segmentEndTime = segmentEndTime;
         this.segmentDuration = segmentDuration;
         this.segmentNumber = segmentNumber;
         this.storagePath = storagePath;
@@ -21,7 +24,11 @@ public final class SegmentInfo {
     }
 
     public SegmentInfo(IStreamRecorder recorder) {
-        this(recorder.getSegmentDuration(), recorder.getSegmentNumber(), recorder.getAppInstance().getStreamStoragePath(), recorder.getCurrentFile());
+        this(new DateTime(), recorder.getSegmentDuration(), recorder.getSegmentNumber(), recorder.getAppInstance().getStreamStoragePath(), recorder.getCurrentFile());
+    }
+
+    public DateTime getSegmentEndTime() {
+        return segmentEndTime;
     }
 
     public long getSegmentDuration() {
