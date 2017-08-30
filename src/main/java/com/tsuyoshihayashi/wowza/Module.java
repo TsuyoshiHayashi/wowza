@@ -14,12 +14,16 @@ import java.util.Optional;
  * @author Alexey Donov
  */
 public final class Module extends ModuleBase implements IModuleOnApp, IModuleOnStream {
+    private static final String UPLOAD_OVERRIDE_ENDPOINT_KEY = "uploadOverrideEndpoint";
+
     private @Nullable StreamListener streamListener = null;
     private final @NotNull RecordManagerListener recordManagerListener = new RecordManagerListener();
 
     // IModuleOnApp
     @Override
     public void onAppStart(IApplicationInstance instance) {
+        RecorderListener.uploadOverrideEndpoint = instance.getProperties().getPropertyStr(UPLOAD_OVERRIDE_ENDPOINT_KEY);
+
         streamListener = new StreamListener(instance);
         instance.getVHost().getLiveStreamRecordManager().addListener(recordManagerListener);
     }

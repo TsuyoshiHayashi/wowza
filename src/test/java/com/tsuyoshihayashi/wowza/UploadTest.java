@@ -48,12 +48,4 @@ public class UploadTest extends TestCase {
 
         assertEquals(expected, actual);
     }
-
-    public void testUploadFile() {
-//        final RecordSettings recordSettings = new RecordSettings(FILE_NAME_FORMAT, LIMIT_MINUTES, "http://web18.ldz.jp/system/api/widget/upload_api_test.php", "Y7h_7_gfx8jb", "LAQKQgCHqYIu", "http://logic-design.jp/");
-//        final File file = new File(ORIGINAL_FILE_PATH, ORIGINAL_FILE_NAME);
-//
-//        final String response = RecorderListener.uploadFile(file, recordSettings);
-//        System.out.println(response);
-    }
 }

@@ -30,6 +30,13 @@
                     <Value>http://logic-design.jp/</Value>
                     <Type>String</Type>
                 </Property>
+                <!--
+                <Property>
+                    <Name>uploadOverrideEndpoint</Name>
+                    <Value>https://www.videog.jp/system/api/widget/upload_api_test.php</Value>
+                    <Type>String</Type>
+                </Property>
+                -->
                 ...
             </Properties>
             ...        

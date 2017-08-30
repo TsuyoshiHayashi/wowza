@@ -11,6 +11,7 @@ import com.wowza.wms.stream.IMediaStream;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.client.Client;
@@ -20,6 +21,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
@@ -30,11 +32,11 @@ import static java.util.concurrent.CompletableFuture.runAsync;
  * @author Alexey Donov
  */
 final class RecorderListener extends StreamRecorderActionNotifyBase {
-    private static final boolean USE_TEST_ENDPOINT = true;
-
     private static final WMSLogger logger = WMSLoggerFactory.getLogger(RecorderListener.class);
     private static final Client client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
     private static final Map<String, RecordSettings> streamRecordSettings = new HashMap<>();
+
+    static @Nullable String uploadOverrideEndpoint = null;
 
     private static RecordSettings getRecordSettings(IStreamRecorder recorder) {
         return streamRecordSettings.get(recorder.getStreamName());
@@ -76,7 +78,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
         return newFile;
     }
 
-    static String uploadFile(File file, RecordSettings settings) {
+    private static String uploadFile(File file, RecordSettings settings) {
         final FormDataMultiPart form = new FormDataMultiPart();
         form.field("hash", settings.getHash());
         form.field("hash2", settings.getHash2());
@@ -84,10 +86,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
         form.field("comment", "");
         form.bodyPart(new FileDataBodyPart("video_file", file, new MediaType("video", "mp4")));
 
-        String endpoint = settings.getUploadURL();
-        if (USE_TEST_ENDPOINT) {
-            endpoint = endpoint.replace("upload_api.php", "upload_api_test.php");
-        }
+        String endpoint = Optional.ofNullable(uploadOverrideEndpoint).orElse(settings.getUploadURL());
 
         logger.info(String.format("Uploading segment %s to %s", file.getName(), endpoint));
 

@@ -3,8 +3,6 @@ package com.tsuyoshihayashi.model;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 
-import java.util.stream.Stream;
-
 /**
  * @author Alexey Donov
  */
