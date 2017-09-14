@@ -74,7 +74,7 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>15.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -125,6 +125,7 @@
                             <outputDirectory>${project.deploy.dir}</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
+                            <excludeGroupIds>junit,org.hamcrest</excludeGroupIds>
                             <excludeScope>provided</excludeScope>
                         </configuration>
                     </execution>
