@@ -44,4 +44,29 @@
     </Root>
 ```
 
-4. Restart Wowza
+4. Modify ```/usr/local/WowzaStreamingEngine/conf/VHost.xml``` to include following information:
+
+```xml
+    <Root>
+        <VHost>
+            <HostPortList>
+                <HostPort>
+                    ...
+                    <Port>1935</Port>
+                    ...
+                    <HTTPProviders>
+                        ...
+                        <HTTPProvider>
+                            <BaseClass>com.tsuyoshihayashi.wowza.RecorderControl</BaseClass>
+                            <RequestFilters>recordctrl*</RequestFilters>
+                            <AuthenticationMethod>none</AuthenticationMethod>
+                        </HTTPProvider>
+                        ...
+                    </HTTPProviders>
+                </HostPort>
+            </HostPortList>
+        </VHost>
+    </Root>
+```
+
+5. Restart Wowza
