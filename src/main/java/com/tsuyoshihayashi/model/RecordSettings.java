@@ -1,6 +1,7 @@
 package com.tsuyoshihayashi.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 
 /**
@@ -12,19 +13,22 @@ public final class RecordSettings {
     private static final String UPLOAD_URL_KEY = "place";
     private static final String HASH_KEY = "hash";
     private static final String HASH2_KEY = "hash2";
+    private static final String AUTO_RECORD_KEY = "manual_start";
 
     private final @NotNull String fileNameFormat;
     private final long limit;
-    private final @NotNull String uploadURL;
+    private final boolean autoRecord;
+    private final @Nullable String uploadURL;
     private final @NotNull String hash;
     private final @NotNull String hash2;
     private final @NotNull String referer;
 
-    public RecordSettings(@NotNull String fileNameFormat, long limit, @NotNull String uploadURL, @NotNull String hash, @NotNull String hash2, @NotNull String referer) {
+    public RecordSettings(@NotNull String fileNameFormat, long limit, boolean autoRecord, @NotNull String uploadURL, @NotNull String hash, @NotNull String hash2, @NotNull String referer) {
         super();
 
         this.fileNameFormat = fileNameFormat;
         this.limit = limit;
+        this.autoRecord = autoRecord;
         this.uploadURL = uploadURL;
         this.hash = hash;
         this.hash2 = hash2;
@@ -32,7 +36,12 @@ public final class RecordSettings {
     }
 
     public RecordSettings(@NotNull JSONObject json, @NotNull String referer) {
-        this(json.get(FILE_NAME_FORMAT_KEY).toString(), Long.parseLong(json.get(LIMIT_KEY).toString()), json.get(UPLOAD_URL_KEY).toString(), json.get(HASH_KEY).toString(), json.get(HASH2_KEY).toString(), referer);
+        this(json.get(FILE_NAME_FORMAT_KEY).toString(),
+            Long.parseLong(json.get(LIMIT_KEY).toString()),
+            Boolean.parseBoolean(json.get(AUTO_RECORD_KEY).toString()),
+            json.get(UPLOAD_URL_KEY).toString(),
+            json.get(HASH_KEY).toString(),
+            json.get(HASH2_KEY).toString(), referer);
     }
 
     public @NotNull String getFileNameFormat() {
@@ -43,7 +52,11 @@ public final class RecordSettings {
         return limit;
     }
 
-    public @NotNull String getUploadURL() {
+    public boolean isAutoRecord() {
+        return autoRecord;
+    }
+
+    public @Nullable String getUploadURL() {
         return uploadURL;
     }
 
