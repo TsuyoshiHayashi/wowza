@@ -76,15 +76,17 @@ final class StreamListener extends MediaStreamActionNotifyBase {
             .thenAccept(settings -> {
                 stream.getProperties().setProperty(RECORD_SETTINGS_KEY, settings);
 
-                final StreamRecorderParameters parameters = new StreamRecorderParameters(instance);
-                parameters.fileFormat = IStreamRecorderConstants.FORMAT_MP4;
-                parameters.segmentationType = IStreamRecorderConstants.SEGMENT_BY_DURATION;
-                parameters.segmentDuration = settings.getLimit() * 60 * 1000;
-                parameters.startOnKeyFrame = true;
-                parameters.recordData = true;
-                parameters.outputPath = instance.getStreamStoragePath();
+                if (settings.isAutoRecord()) {
+                    final StreamRecorderParameters parameters = new StreamRecorderParameters(instance);
+                    parameters.fileFormat = IStreamRecorderConstants.FORMAT_MP4;
+                    parameters.segmentationType = IStreamRecorderConstants.SEGMENT_BY_DURATION;
+                    parameters.segmentDuration = settings.getLimit() * 60 * 1000;
+                    parameters.startOnKeyFrame = true;
+                    parameters.recordData = true;
+                    parameters.outputPath = instance.getStreamStoragePath();
 
-                instance.getVHost().getLiveStreamRecordManager().startRecording(instance, name, parameters);
+                    instance.getVHost().getLiveStreamRecordManager().startRecording(instance, name, parameters);
+                }
             });
     }
 

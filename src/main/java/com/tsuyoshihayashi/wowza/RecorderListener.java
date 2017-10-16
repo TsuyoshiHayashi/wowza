@@ -79,6 +79,10 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
     }
 
     private static String uploadFile(File file, RecordSettings settings) {
+        if (settings.getUploadURL() == null) {
+            return String.format("No upload URL for [%s], skipping upload", file);
+        }
+
         final FormDataMultiPart form = new FormDataMultiPart();
         form.field("hash", settings.getHash());
         form.field("hash2", settings.getHash2());
