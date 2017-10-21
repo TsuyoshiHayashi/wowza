@@ -41,7 +41,7 @@ public class UploadTest extends TestCase {
             .replaceFirst("SS", String.format("%02d", end.getSecondOfMinute())));
         System.out.println("Expected: " + expected);
 
-        final RecordSettings recordSettings = new RecordSettings(FILE_NAME_FORMAT, LIMIT_MINUTES, "", "", "", "");
+        final RecordSettings recordSettings = new RecordSettings(FILE_NAME_FORMAT, LIMIT_MINUTES, false, "", "", "", "");
         final SegmentInfo segmentInfo = new SegmentInfo(end, 10000, 0, ORIGINAL_FILE_PATH, ORIGINAL_FILE_PATH.concat("/").concat(ORIGINAL_FILE_NAME));
         final String actual = RecorderListener.createNewName(recordSettings, segmentInfo);
         System.out.println("  Actual: " + actual);
