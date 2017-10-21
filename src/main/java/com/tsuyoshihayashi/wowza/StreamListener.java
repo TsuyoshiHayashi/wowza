@@ -11,10 +11,12 @@ import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.stream.MediaStreamActionNotifyBase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
+import static com.tsuyoshihayashi.model.RecordSettings.fromJSON;
 import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
@@ -54,17 +56,17 @@ final class StreamListener extends MediaStreamActionNotifyBase {
                 .request()
                 .get(String.class);
 
-            final JSONObject response = (JSONObject) parser.parse(responseText);
-            final RecordSettings settings = new RecordSettings(response, uploadReferer);
+            logger.info(String.format("API Response: %s", responseText));
 
-            logger.info(String.format("Record settings: name '%s', split on %d minutes, upload to %s", settings.getFileNameFormat(), settings.getLimit(), settings.getUploadURL()));
+            final JSONObject response = (JSONObject) parser.parse(responseText);
+            final RecordSettings settings = fromJSON(response, uploadReferer);
+
+            logger.info(String.format("Record settings: autostart '%s', name '%s', split on %d minutes, upload to '%s'", settings.isAutoRecord(), settings.getFileNameFormat(), settings.getLimit(), settings.getUploadURL()));
 
             return settings;
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 
     // IMediaStreamActionNotify
@@ -87,7 +89,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
 
                     instance.getVHost().getLiveStreamRecordManager().startRecording(instance, name, parameters);
                 }
-            });
+            }).whenComplete((v, t) -> logger.error(t.getMessage()));
     }
 
     @Override
