@@ -23,7 +23,7 @@ public final class RecordSettings {
     private final @NotNull String hash2;
     private final @NotNull String referer;
 
-    public RecordSettings(@NotNull String fileNameFormat, long limit, boolean autoRecord, @NotNull String uploadURL, @NotNull String hash, @NotNull String hash2, @NotNull String referer) {
+    public RecordSettings(@NotNull String fileNameFormat, long limit, boolean autoRecord, @Nullable String uploadURL, @NotNull String hash, @NotNull String hash2, @NotNull String referer) {
         super();
 
         this.fileNameFormat = fileNameFormat;
@@ -35,11 +35,18 @@ public final class RecordSettings {
         this.referer = referer;
     }
 
-    public RecordSettings(@NotNull JSONObject json, @NotNull String referer) {
-        this(json.get(FILE_NAME_FORMAT_KEY).toString(),
+    public static RecordSettings fromJSON(@NotNull JSONObject json, @NotNull String referer) {
+        if (!json.containsKey(FILE_NAME_FORMAT_KEY) ||
+            !json.containsKey(LIMIT_KEY) ||
+            !json.containsKey(HASH_KEY) ||
+            !json.containsKey(HASH2_KEY)) {
+            throw new IllegalArgumentException("JSON Object is not full");
+        }
+
+        return new RecordSettings(json.get(FILE_NAME_FORMAT_KEY).toString(),
             Long.parseLong(json.get(LIMIT_KEY).toString()),
-            Boolean.parseBoolean(json.get(AUTO_RECORD_KEY).toString()),
-            json.get(UPLOAD_URL_KEY).toString(),
+            !json.containsKey(AUTO_RECORD_KEY) || !Boolean.parseBoolean(json.get(AUTO_RECORD_KEY).toString()),
+            json.containsKey(UPLOAD_URL_KEY) ? json.get(UPLOAD_URL_KEY).toString() : null,
             json.get(HASH_KEY).toString(),
             json.get(HASH2_KEY).toString(), referer);
     }
