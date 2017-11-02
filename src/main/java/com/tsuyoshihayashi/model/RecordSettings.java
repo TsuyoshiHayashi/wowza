@@ -45,7 +45,7 @@ public final class RecordSettings {
 
         return new RecordSettings(json.get(FILE_NAME_FORMAT_KEY).toString(),
             Long.parseLong(json.get(LIMIT_KEY).toString()),
-            !json.containsKey(AUTO_RECORD_KEY) || !Boolean.parseBoolean(json.get(AUTO_RECORD_KEY).toString()),
+            !json.containsKey(AUTO_RECORD_KEY) || Integer.parseInt(json.get(AUTO_RECORD_KEY).toString()) == 0,
             json.containsKey(UPLOAD_URL_KEY) ? json.get(UPLOAD_URL_KEY).toString() : null,
             json.get(HASH_KEY).toString(),
             json.get(HASH2_KEY).toString(), referer);
