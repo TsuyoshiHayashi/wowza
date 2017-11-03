@@ -67,6 +67,7 @@ public class RecorderControl extends HTTPProvider2Base {
 
         switch (action) {
             case ACTION_START:
+                logger.info(String.format("Starting record for stream %s", streamName));
                 final StreamRecorderParameters parameters = new StreamRecorderParameters(instance);
                 parameters.fileFormat = IStreamRecorderConstants.FORMAT_MP4;
                 parameters.segmentationType = IStreamRecorderConstants.SEGMENT_BY_DURATION;
@@ -79,7 +80,12 @@ public class RecorderControl extends HTTPProvider2Base {
                 break;
 
             case ACTION_STOP:
+                logger.info(String.format("Stopping record for stream %s", streamName));
                 host.getLiveStreamRecordManager().stopRecording(instance, streamName);
+                break;
+
+            default:
+                logger.error(String.format("Unknown record command [%s]", action));
                 break;
         }
 
