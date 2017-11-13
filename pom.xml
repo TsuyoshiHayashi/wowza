@@ -42,6 +42,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.wms</groupId>
+            <artifactId>wms-pushpublish</artifactId>
+            <version>4.7.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.3</version>
@@ -97,7 +103,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
+                <version>3.0.2</version>
                 <executions>
                     <execution>
                         <id>copy</id>
@@ -118,6 +124,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
@@ -133,9 +140,9 @@
                         <version>0.1.54</version>
                     </dependency>
                     <dependency>
-                        <groupId>ant</groupId>
+                        <groupId>org.apache.ant</groupId>
                         <artifactId>ant-jsch</artifactId>
-                        <version>1.6.5</version>
+                        <version>1.10.1</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -147,7 +154,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <scp remotetodir="${deploy.remote.username}@${deploy.remote.host}:${deploy.remote.dir}" keyfile="${deploy.key.path}" passphrase="${deploy.key.passphrase}" trust="yes">
+                                <scp remotetodir="${deploy.remote.username}@${deploy.remote.host}:${deploy.remote.dir}" keyfile="${deploy.key.path}" passphrase="${deploy.key.passphrase}" trust="yes" compressed="true" verbose="true">
                                     <fileset dir="${project.build.directory}">
                                         <include name="*.jar"/>
                                     </fileset>
