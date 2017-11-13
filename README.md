@@ -30,6 +30,11 @@
                     <Value>http://logic-design.jp/</Value>
                     <Type>String</Type>
                 </Property>
+                <Property>
+                    <Name>pushHost</Name>
+                    <Value>publish52.videog.jp</Value>
+                    <Type>String</Type>
+                </Property>
                 <!--
                 <Property>
                     <Name>uploadOverrideEndpoint</Name>
@@ -61,6 +66,11 @@
                             <RequestFilters>recordctrl*</RequestFilters>
                             <AuthenticationMethod>none</AuthenticationMethod>
                         </HTTPProvider>
+                        <HTTPProvider>
+                            <BaseClass>com.tsuyoshihayashi.wowza.FileControl</BaseClass>
+                            <RequestFilters>filectrl*</RequestFilters>
+                            <AuthenticationMethod>none</AuthenticationMethod>
+                        </HTTPProvider>
                         ...
                     </HTTPProviders>
                 </HostPort>
@@ -69,4 +79,30 @@
     </Root>
 ```
 
-5. Restart Wowza
+5. Modify `/usr/local/WowzaStreamingEngine/conf/Server.xml` to include following information:
+
+```xml
+    <Root>
+        <Server>
+            ...
+            <ServerListeners>
+                ...
+                <ServerListener>
+                    <BaseClass>com.tsuyoshihayashi.wowza.ServerListener</BaseClass>
+                </ServerListener>
+            </ServerListeners>
+            ...
+            <Properties>
+                ...
+                <Property>
+                    <Name>maxFileAge</Name>
+                    <Value>3</Value>
+                    <Type>Integer</Type>
+                </Property>
+            </Properties>
+            ...
+        </Server>
+    </Root>
+```
+
+6. Restart Wowza
