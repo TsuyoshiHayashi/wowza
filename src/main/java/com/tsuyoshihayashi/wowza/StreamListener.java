@@ -115,9 +115,12 @@ final class StreamListener extends MediaStreamActionNotifyBase {
                     publisher.setDstAppInstanceName(ApplicationInstance.DEFAULT_APPINSTANCE_NAME);
                     publisher.setDstStreamName(stream.getName());
                     publisher.setConnectionFlashVerion(PushPublishRTMP.CURRENTFLASHVERSION);
+                    publisher.setSendOriginalTimecodes(true);
+                    publisher.setOriginalTimecodeThreshold(0x100000);
                     publisher.setSendFCPublish(true);
                     publisher.setSendReleaseStream(true);
                     publisher.setSendOnMetadata(true);
+                    publisher.setDebugPackets(false);
 
                     publisher.connect();
                     stream.getProperties().setProperty(PUBLISHER_PROPERTY_NAME, publisher);
