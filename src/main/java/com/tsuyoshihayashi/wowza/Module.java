@@ -1,5 +1,6 @@
 package com.tsuyoshihayashi.wowza;
 
+import com.tsuyoshihayashi.model.AliasProvider;
 import com.wowza.wms.application.IApplicationInstance;
 import com.wowza.wms.module.IModuleOnApp;
 import com.wowza.wms.module.IModuleOnStream;
@@ -26,6 +27,8 @@ public final class Module extends ModuleBase implements IModuleOnApp, IModuleOnS
 
         streamListener = new StreamListener(instance);
         instance.getVHost().getLiveStreamRecordManager().addListener(recordManagerListener);
+
+        instance.setStreamNameAliasProvider(AliasProvider.instance());
     }
 
     @Override

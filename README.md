@@ -71,6 +71,11 @@
                             <RequestFilters>filectrl*</RequestFilters>
                             <AuthenticationMethod>none</AuthenticationMethod>
                         </HTTPProvider>
+                        <HTTPProvider>
+                            <BaseClass>com.tsuyoshihayashi.wowza.CameraControl</BaseClass>
+                            <RequestFilters>cameractrl*</RequestFilters>
+                            <AuthenticationMethod>none</AuthenticationMethod>
+                        </HTTPProvider>
                         ...
                     </HTTPProviders>
                 </HostPort>
