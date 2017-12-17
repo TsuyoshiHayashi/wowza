@@ -12,7 +12,7 @@ import java.util.Map;
  * @author Alexey Donov
  */
 public final class AliasProvider implements IMediaStreamNameAliasProvider {
-    private static final String URL_FORMAT = "rtsp://%s";
+    private final Map<String, String> urlFormats = new HashMap<>();
 
     private static AliasProvider instance = null;
 
@@ -29,15 +29,15 @@ public final class AliasProvider implements IMediaStreamNameAliasProvider {
     private final Map<String, String> cameraURLs = new HashMap<>();
 
     private AliasProvider() {
-
+        urlFormats.put("SNC-WR630", "rtsp://%s");
     }
 
     private String getCameraURL(String streamName) {
         return cameraURLs.get(streamName);
     }
 
-    public void setCameraIP(String streamName, String ip) {
-        final String url = String.format(URL_FORMAT, ip);
+    public void setCameraIP(String streamName, String ip, String type) {
+        final String url = String.format(urlFormats.get(type), ip);
         logger.info(String.format("Adding URL for camera: %s -> %s", streamName, url));
 
         cameraURLs.put(streamName, url);
