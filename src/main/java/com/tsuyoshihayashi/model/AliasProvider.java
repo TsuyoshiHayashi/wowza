@@ -29,7 +29,7 @@ public final class AliasProvider implements IMediaStreamNameAliasProvider {
     private final Map<String, String> cameraURLs = new HashMap<>();
 
     private AliasProvider() {
-        urlFormats.put("SNC-WR630", "rtsp://%s");
+
     }
 
     private String getCameraURL(String streamName) {
@@ -37,10 +37,9 @@ public final class AliasProvider implements IMediaStreamNameAliasProvider {
     }
 
     public void setCameraIP(String streamName, String ip, String type) {
-        final String url = String.format(urlFormats.get(type), ip);
-        logger.info(String.format("Adding URL for camera: %s -> %s", streamName, url));
+        logger.info(String.format("Adding URL for camera: %s -> %s", streamName, type));
 
-        cameraURLs.put(streamName, url);
+        cameraURLs.put(streamName, type);
     }
 
     @Override
