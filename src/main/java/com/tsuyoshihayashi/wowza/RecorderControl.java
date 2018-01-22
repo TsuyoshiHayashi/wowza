@@ -16,6 +16,7 @@ import com.wowza.wms.vhost.IVHost;
 import java.util.Arrays;
 
 import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
  * @author Alexey Donov
@@ -92,6 +93,6 @@ public class RecorderControl extends Control {
                 break;
         }
 
-        writeResponse(response, 200, "{\"ok\": true}", "application/json");
+        writeResponse(response, 200, "{\"ok\": true}", APPLICATION_JSON);
     }
 }

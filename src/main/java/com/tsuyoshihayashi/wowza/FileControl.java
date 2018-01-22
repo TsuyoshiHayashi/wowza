@@ -12,6 +12,8 @@ import java.io.File;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
 /**
  * @author Alexey Donov
  */
@@ -57,7 +59,7 @@ public final class FileControl extends Control {
                         .ifPresent(fileArray -> Stream.of(fileArray)
                             .map(this::fileData)
                             .forEach(files::add));
-                    writeResponse(response, 200, files.toJSONString(), "application/json");
+                    writeResponse(response, 200, files.toJSONString(), APPLICATION_JSON);
                     return;
 
                 case ACTION_DELETE:
@@ -72,7 +74,7 @@ public final class FileControl extends Control {
                         //noinspection ResultOfMethodCallIgnored
                         file.delete();
                     }
-                    writeResponse(response, 200, "{\"ok\": true}", "application/json");
+                    writeResponse(response, 200, "{\"ok\": true}", APPLICATION_JSON);
                     return;
 
                 default:

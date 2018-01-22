@@ -10,6 +10,8 @@ import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.vhost.IVHost;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
 /**
  * @author Alexey Donov
  */
@@ -75,7 +77,7 @@ public final class CameraControl extends Control {
                     return;
             }
 
-            writeResponse(response, 200, "{\"ok\": true}", "application/json");
+            writeResponse(response, 200, "{\"ok\": true}", APPLICATION_JSON);
         } catch (Exception e) {
             writeResponse(response, 500, e.getMessage());
         }
