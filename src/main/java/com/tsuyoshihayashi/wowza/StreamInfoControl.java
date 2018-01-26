@@ -22,9 +22,9 @@ public class StreamInfoControl extends Control {
     @SuppressWarnings("unchecked")
     private JSONObject streamInfo(IMediaStream stream) {
         final JSONObject obj = new JSONObject();
+        obj.put("total_bitrate", stream.getPublishBitrateAudio() + stream.getPublishBitrateVideo());
         obj.put("video_bitrate", stream.getPublishBitrateVideo());
         obj.put("audio_bitrate", stream.getPublishBitrateAudio());
-        obj.put("fps", stream.getReceiveVideoFPS());
 
         return obj;
     }
