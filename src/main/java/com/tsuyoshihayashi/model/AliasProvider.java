@@ -12,8 +12,6 @@ import java.util.Map;
  * @author Alexey Donov
  */
 public final class AliasProvider implements IMediaStreamNameAliasProvider {
-    private final Map<String, String> urlFormats = new HashMap<>();
-
     private static AliasProvider instance = null;
 
     public static AliasProvider instance() {
@@ -36,10 +34,10 @@ public final class AliasProvider implements IMediaStreamNameAliasProvider {
         return cameraURLs.get(streamName);
     }
 
-    public void setCameraIP(String streamName, String ip, String type) {
-        logger.info(String.format("Adding URL for camera: %s -> %s", streamName, type));
+    public void setCameraIP(String streamName, String ip) {
+        logger.info(String.format("Adding URL for camera: %s -> %s", streamName, ip));
 
-        cameraURLs.put(streamName, type);
+        cameraURLs.put(streamName, ip);
     }
 
     @Override

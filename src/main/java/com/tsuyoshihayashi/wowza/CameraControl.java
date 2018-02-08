@@ -18,9 +18,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public final class CameraControl extends Control {
     private static final String ACTION_START = "start";
     private static final String ACTION_STOP = "stop";
-    private static final String STREAM_PARAMETER_NAME = "name";
-    private static final String IP_PARAMETER_NAME = "ip";
-    private static final String TYPE_PARAMETER_NAME = "type";
+    private static final String STREAM_PARAMETER_NAME = "s";
+    private static final String IP_PARAMETER_NAME = "c";
 
     private final WMSLogger logger = WMSLoggerFactory.getLogger(CameraControl.class);
 
@@ -54,15 +53,10 @@ public final class CameraControl extends Control {
                         writeBadRequestResponse(response);
                         return;
                     }
-                    final String type = request.getParameter(TYPE_PARAMETER_NAME);
-                    if (type == null || type.isEmpty()) {
-                        writeBadRequestResponse(response);
-                        return;
-                    }
 
-                    logger.info(String.format("Starting camera stream=%s ip=%s type=%s", stream, ip, type));
+                    logger.info(String.format("Starting camera stream=%s ip=%s", stream, ip));
 
-                    AliasProvider.instance().setCameraIP(stream, ip, type);
+                    AliasProvider.instance().setCameraIP(stream, ip);
                     instance.startMediaCasterStream(stream, "rtp");
                     break;
 
