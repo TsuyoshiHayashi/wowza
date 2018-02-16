@@ -10,38 +10,37 @@ import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.mediacaster.MediaCasterStreamItem;
 import com.wowza.wms.vhost.IVHost;
-import org.json.simple.JSONObject;
-
-import java.util.Collections;
-
-import static java.util.Collections.singletonMap;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
+ * Object that handles requests to start/stop RTSP camera streaming
+ *
  * @author Alexey Donov
  */
 public final class CameraControl extends Control {
     private static final String ACTION_START = "start";
     private static final String ACTION_STOP = "stop";
     private static final String STREAM_PARAMETER_NAME = "s";
-    private static final String IP_PARAMETER_NAME = "c";
+    private static final String URL_PARAMETER_NAME = "c";
 
     private final WMSLogger logger = WMSLoggerFactory.getLogger(CameraControl.class);
 
     @Override
     public void onHTTPRequest(IVHost host, IHTTPRequest request, IHTTPResponse response) {
         try {
+            // Ensure that this is a GET request
             if (!"GET".equals(request.getMethod())) {
                 writeBadRequestResponse(response);
                 return;
             }
 
+            // Ensure that the action parameter is present in the request
             final String action = request.getParameter(ACTION_PARAMETER_NAME);
             if (action == null || action.isEmpty()) {
                 writeBadRequestResponse(response);
                 return;
             }
 
+            // Ensure that the stream name parameter is present in the request
             final String streamName = request.getParameter(STREAM_PARAMETER_NAME);
             if (streamName == null || streamName.isEmpty()) {
                 writeBadRequestResponse(response);
@@ -53,12 +52,14 @@ public final class CameraControl extends Control {
 
             switch (action) {
                 case ACTION_START:
-                    final String url = request.getParameter(IP_PARAMETER_NAME);
+                    // Ensure that the camera RTSP URL parameter is present in the request
+                    final String url = request.getParameter(URL_PARAMETER_NAME);
                     if (url == null || url.isEmpty()) {
                         writeBadRequestResponse(response);
                         return;
                     }
 
+                    // If there is already a stream with this name, stop it
                     instance.getMediaCasterStreams()
                         .getMediaCasterStreamItems()
                         .stream()
@@ -67,15 +68,18 @@ public final class CameraControl extends Control {
                         .findAny()
                         .ifPresent(instance::stopMediaCasterStream);
 
-                    logger.info(String.format("Starting camera stream=%s url=%s", streamName, url));
+                    // Set the RTSP URL for the stream name
                     AliasProvider.instance().setCameraURL(streamName, url);
 
+                    // Start the streaming
+                    logger.info(String.format("Starting camera stream=%s url=%s", streamName, url));
                     instance.startMediaCasterStream(streamName, "rtp");
                     break;
 
                 case ACTION_STOP:
                     logger.info(String.format("Stopping camera stream=%s", streamName));
 
+                    // Stop the streaming
                     instance.stopMediaCasterStream(streamName);
                     break;
 

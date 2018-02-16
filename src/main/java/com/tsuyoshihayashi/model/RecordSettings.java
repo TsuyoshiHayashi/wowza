@@ -5,6 +5,8 @@ import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 
 /**
+ * Object that represents record settings received from API
+ *
  * @author Alexey Donov
  */
 public final class RecordSettings {
@@ -35,6 +37,13 @@ public final class RecordSettings {
         this.referer = referer;
     }
 
+    /**
+     * Create an instance from JSON response
+     *
+     * @param json JSON response from API
+     * @param referer Referer domain name that made the request
+     * @return Record settings from the JSON
+     */
     public static RecordSettings fromJSON(@NotNull JSONObject json, @NotNull String referer) {
         if (!json.containsKey(FILE_NAME_FORMAT_KEY) ||
             !json.containsKey(LIMIT_KEY) ||

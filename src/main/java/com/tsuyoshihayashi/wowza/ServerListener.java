@@ -17,6 +17,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
+ * Object that optionally can check and remove old files from the content directory.
+ * Currently is unused - this is being done by cron script.
+ *
  * @author Alexey Donov
  */
 public class ServerListener extends ServerNotifyBase {
@@ -29,17 +32,34 @@ public class ServerListener extends ServerNotifyBase {
     @NotNull
     private final ScheduledExecutorService pool = Executors.newScheduledThreadPool(1);
 
+    /**
+     * Variable that stores the checking schedule
+     */
     @Nullable
     private ScheduledFuture fileCheckFuture = null;
 
+    /**
+     * Determine if the file is considered old
+     *
+     * @param file File object
+     * @return true if the file is old
+     */
     private boolean tooOld(File file) {
         return (System.currentTimeMillis() - file.lastModified()) / (1000 * 60 * 60 * 24) > maxFileAge;
     }
 
+    /**
+     * Log the delete action
+     *
+     * @param file File being deleted
+     */
     private void logDeletion(File file) {
         logger.info(String.format("File %s is too old, deleting", file.getName()));
     }
 
+    /**
+     * Check the list of files in the content directory and delete ones that are old
+     */
     private void checkFiles() {
         final File root = new File("/usr/local/WowzaStreamingEngine");
 
@@ -51,10 +71,20 @@ public class ServerListener extends ServerNotifyBase {
                 .forEach(File::delete));
     }
 
+    /**
+     * Stop checking the content directory
+     *
+     * @param future Schedule object
+     */
     private void cancelFuture(ScheduledFuture future) {
         future.cancel(false);
     }
 
+    /**
+     * When the server starts, schedule the checks every 1 minute
+     *
+     * @param server Server object
+     */
     @Override
     public void onServerInit(IServer server) {
         final WMSProperties properties = server.getProperties();
@@ -66,6 +96,11 @@ public class ServerListener extends ServerNotifyBase {
         }
     }
 
+    /**
+     * When the server stops, remove the checking schedule
+     *
+     * @param server Server object
+     */
     @Override
     public void onServerShutdownStart(IServer server) {
         Optional.ofNullable(fileCheckFuture).ifPresent(this::cancelFuture);

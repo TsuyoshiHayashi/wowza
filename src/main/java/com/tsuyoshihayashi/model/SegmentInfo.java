@@ -4,6 +4,8 @@ import com.wowza.wms.livestreamrecord.manager.IStreamRecorder;
 import org.joda.time.DateTime;
 
 /**
+ * Object that stores recorded segment information to be sent to API
+ *
  * @author Alexey Donov
  */
 public final class SegmentInfo {
@@ -23,6 +25,11 @@ public final class SegmentInfo {
         this.currentFile = currentFile;
     }
 
+    /**
+     * Create an instance from Stream recorder object information
+     *
+     * @param recorder Stream recorder
+     */
     public SegmentInfo(IStreamRecorder recorder) {
         this(new DateTime(), recorder.getSegmentDuration(), recorder.getSegmentNumber(), recorder.getAppInstance().getStreamStoragePath(), recorder.getCurrentFile());
     }

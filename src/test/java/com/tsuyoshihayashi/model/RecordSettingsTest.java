@@ -6,11 +6,30 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
+ * Test for the record settings object to ensure correct initialization from JSON
+ *
  * @author Alexey Donov
  */
 public class RecordSettingsTest extends TestCase {
     private static final JSONParser parser = new JSONParser();
 
+    /**
+     * Initialization from an empty JSON
+     */
+    public void testInsufficientFieldSet() {
+        try {
+            RecordSettings.fromJSON((JSONObject) parser.parse("{}"), "");
+            fail("Arguments are missing");
+        } catch (ParseException ignore) {
+            fail("Must be parseable");
+        } catch (IllegalArgumentException ignore) {
+            // OK
+        }
+    }
+
+    /**
+     * Initialization from a JSON with minimal set of parameters
+     */
     public void testMinimalFieldSet() {
         try {
             RecordSettings.fromJSON((JSONObject) parser.parse("{\"record_name\":\"\", \"limit\":0, \"hash\":\"hash\", \"hash2\":\"hash2\"}"), "");
@@ -21,6 +40,9 @@ public class RecordSettingsTest extends TestCase {
         }
     }
 
+    /**
+     * Test manual record start parameter
+     */
     public void testManualStart() {
         try {
             RecordSettings rs;
@@ -33,6 +55,9 @@ public class RecordSettingsTest extends TestCase {
         }
     }
 
+    /**
+     * Test automatic record start parameter
+     */
     public void testAutoStart() {
         try {
             RecordSettings rs;

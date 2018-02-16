@@ -16,9 +16,10 @@ import com.wowza.wms.vhost.IVHost;
 import java.util.Arrays;
 
 import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
+ * Object that handles requests that control stream recording
+ *
  * @author Alexey Donov
  */
 public class RecorderControl extends Control {
@@ -30,23 +31,27 @@ public class RecorderControl extends Control {
 
     @Override
     public void onHTTPRequest(IVHost host, IHTTPRequest request, IHTTPResponse response) {
+        // Ensure that this is a GET request
         if (!"GET".equals(request.getMethod())) {
             writeBadRequestResponse(response);
             return;
         }
 
+        // Ensure that action parameter is present in the request
         final String action = request.getParameter(ACTION_PARAMETER_NAME);
         if (action == null || !Arrays.asList(ACTION_START, ACTION_STOP).contains(action)) {
             writeBadRequestResponse(response);
             return;
         }
 
+        // Ensure that stream name parameter is present in the request
         final String streamName = request.getParameter(STREAM_PARAMETER_NAME);
         if (streamName == null || streamName.isEmpty()) {
             writeBadRequestResponse(response);
             return;
         }
 
+        // Ensure that the live application instance is running
         final IApplicationInstance instance = host.getApplication("live").getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME);
         if (instance == null) {
             logger.warn("No live application instance");
@@ -54,6 +59,7 @@ public class RecorderControl extends Control {
             return;
         }
 
+        // Ensure that the stream with requested name is present in the application instance
         final IMediaStream stream = instance.getStreams().getStream(streamName);
         if (stream == null) {
             logger.warn(String.format("Stream %s not found", streamName));
@@ -61,6 +67,7 @@ public class RecorderControl extends Control {
             return;
         }
 
+        // Ensure that the stream has record settings information
         final WMSProperties properties = stream.getProperties();
         final RecordSettings settings = (RecordSettings) properties.getProperty(RECORD_SETTINGS_KEY);
         if (settings == null) {
@@ -71,7 +78,7 @@ public class RecorderControl extends Control {
 
         switch (action) {
             case ACTION_START:
-                logger.info(String.format("Starting record for stream %s", streamName));
+                // Create stream recorder parameters from the settings
                 final StreamRecorderParameters parameters = new StreamRecorderParameters(instance);
                 parameters.fileFormat = IStreamRecorderConstants.FORMAT_MP4;
                 parameters.segmentationType = IStreamRecorderConstants.SEGMENT_BY_DURATION;
@@ -80,10 +87,13 @@ public class RecorderControl extends Control {
                 parameters.recordData = true;
                 parameters.outputPath = instance.getStreamStoragePath();
 
+                // Start the record
+                logger.info(String.format("Starting record for stream %s", streamName));
                 host.getLiveStreamRecordManager().startRecording(instance, streamName, parameters);
                 break;
 
             case ACTION_STOP:
+                // Stop the record
                 logger.info(String.format("Stopping record for stream %s", streamName));
                 host.getLiveStreamRecordManager().stopRecording(instance, streamName);
                 break;

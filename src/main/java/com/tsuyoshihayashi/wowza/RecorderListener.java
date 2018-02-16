@@ -29,6 +29,8 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.runAsync;
 
 /**
+ * Object that listens to events in stream recorder
+ *
  * @author Alexey Donov
  */
 final class RecorderListener extends StreamRecorderActionNotifyBase {
@@ -38,18 +40,43 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
 
     static @Nullable String uploadOverrideEndpoint = null;
 
+    /**
+     * Get the record settings from a stream being recorded
+     *
+     * @param recorder Stream recorder
+     * @return RecordSettings object
+     */
     private static RecordSettings getRecordSettings(IStreamRecorder recorder) {
         return streamRecordSettings.get(recorder.getStreamName());
     }
 
+    /**
+     * Get the current segment information from the recorder
+     *
+     * @param recorder Stream recorder
+     * @return SegmentInfo object
+     */
     private static SegmentInfo getSegmentInfo(IStreamRecorder recorder) {
         return new SegmentInfo(recorder);
     }
 
+    /**
+     * Get the file object for the recorded segment
+     *
+     * @param segmentInfo Segment information
+     * @return File object
+     */
     static File getRecordedFile(SegmentInfo segmentInfo) {
         return new File(segmentInfo.getCurrentFile());
     }
 
+    /**
+     * Create a file name based on the rules received from API
+     *
+     * @param recordSettings Record settings
+     * @param segmentInfo Current segment information
+     * @return File name
+     */
     static String createNewName(RecordSettings recordSettings, SegmentInfo segmentInfo) {
         final DateTime end = segmentInfo.getSegmentEndTime();
         final DateTime start = end.minus(segmentInfo.getSegmentDuration());
@@ -68,6 +95,13 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
         return String.format("%s/%s", segmentInfo.getStoragePath(), newName);
     }
 
+    /**
+     * Renames the file from a temporary name to a final name
+     *
+     * @param oldFile Temporary file
+     * @param newFileName Final file name
+     * @return File object with a final name
+     */
     private static File renameFile(File oldFile, String newFileName) {
         final File newFile = new File(newFileName);
 
@@ -78,6 +112,13 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
         return newFile;
     }
 
+    /**
+     * Uploads a recorded file
+     *
+     * @param file File object
+     * @param settings RecordSettings object
+     * @return Response from API as a string
+     */
     private static String uploadFile(File file, RecordSettings settings) {
         if (settings.getUploadURL() == null) {
             return String.format("No upload URL for [%s], skipping upload", file);
@@ -109,6 +150,13 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
         }
     }
 
+    // StreamRecorderActionNotify
+
+    /**
+     * When the record is started, save the record settings locally
+     *
+     * @param recorder Stream recorder
+     */
     @Override
     public void onStartRecorder(IStreamRecorder recorder) {
         final IMediaStream stream = recorder.getStream();
@@ -123,24 +171,43 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
         streamRecordSettings.put(recorder.getStreamName(), settings);
     }
 
+    /**
+     * When the record is stopped, the record settings are no longer needed
+     *
+     * @param recorder Stream recorder
+     */
     @Override
     public void onStopRecorder(IStreamRecorder recorder) {
         streamRecordSettings.remove(recorder.getStreamName());
     }
 
+    /**
+     * When a segment is finished recording, rename the file and upload it
+     *
+     * @param recorder Stream recorder
+     */
     @Override
     public void onSegmentEnd(IStreamRecorder recorder) {
+        // Fetch the segment information
         final SegmentInfo segmentInfo = getSegmentInfo(recorder);
         final CompletableFuture<SegmentInfo> segmentInfoFuture = completedFuture(segmentInfo);
 
+        // Fetch the record settings
         final RecordSettings recordSettings = getRecordSettings(recorder);
         final CompletableFuture<RecordSettings> recordSettingsFuture = completedFuture(recordSettings);
 
         runAsync(() -> logger.info("Segment finished"));
 
+        // Fetch the temporary file
         final CompletableFuture<File> oldFileFuture = segmentInfoFuture.thenApply(RecorderListener::getRecordedFile);
+
+        // Generate final file name according to the rules
         final CompletableFuture<String> newFileNameFuture = recordSettingsFuture.thenCombine(segmentInfoFuture, RecorderListener::createNewName);
+
+        // Rename the file
         final CompletableFuture<File> newFileFuture = oldFileFuture.thenCombine(newFileNameFuture, RecorderListener::renameFile);
+
+        // Upload it and log the response
         newFileFuture.thenCombineAsync(recordSettingsFuture, RecorderListener::uploadFile)
             .thenAcceptAsync(response -> logger.info(String.format("Upload response: %s", response)));
     }

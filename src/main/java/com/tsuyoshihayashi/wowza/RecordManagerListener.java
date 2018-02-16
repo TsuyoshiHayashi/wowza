@@ -5,6 +5,8 @@ import com.wowza.wms.livestreamrecord.manager.LiveStreamRecordManagerActionNotif
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Object that adds a record listener to new recorders
+ *
  * @author Alexey Donov
  */
 final class RecordManagerListener extends LiveStreamRecordManagerActionNotifyBase {

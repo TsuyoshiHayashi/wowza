@@ -26,6 +26,8 @@ import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 /**
+ * Object that listens to the events in the streams
+ *
  * @author Alexey Donov
  */
 final class StreamListener extends MediaStreamActionNotifyBase {
@@ -61,6 +63,12 @@ final class StreamListener extends MediaStreamActionNotifyBase {
         logger.info(String.format("API Endpoint: %s", apiEndpoint));
     }
 
+    /**
+     * Ask API to return record settings for the stream
+     *
+     * @param stream Stream object
+     * @return Record settings object
+     */
     private RecordSettings getRecordSettings(IMediaStream stream) {
         try {
             final String responseText = client.target(apiEndpoint)
@@ -83,14 +91,26 @@ final class StreamListener extends MediaStreamActionNotifyBase {
 
     // IMediaStreamActionNotify
 
+    /**
+     * When the stream is published, fetch the record settings from API and process according to them.
+     * The stream is also pushed to the publish host.
+     *
+     * @param stream Stream object
+     * @param name Stream name
+     * @param record Is stream is being recorded (per Wowza settings)
+     * @param append Is record is being appended to an existing file (per Wowza settings)
+     */
     @Override
     public void onPublish(IMediaStream stream, String name, boolean record, boolean append) {
         completedFuture(stream)
+            // Fetch the record settings
             .thenApply(this::getRecordSettings)
             .thenAccept(settings -> {
+                // Store the settings in the stream object
                 stream.getProperties().setProperty(RECORD_SETTINGS_KEY, settings);
 
                 if (settings.isAutoRecord()) {
+                    // If the stream recording should start immediately, do so
                     final StreamRecorderParameters parameters = new StreamRecorderParameters(instance);
                     parameters.fileFormat = IStreamRecorderConstants.FORMAT_MP4;
                     parameters.segmentationType = IStreamRecorderConstants.SEGMENT_BY_DURATION;
@@ -103,6 +123,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
                 }
             }).whenComplete((v, t) -> logger.error(t.getMessage()));
 
+        // Pushing the stream to the publish host
         Optional.ofNullable(pushHost)
             .ifPresent(host -> {
                 logger.info(String.format("Pushing %s stream to %s", stream.getName(), host));
@@ -130,6 +151,15 @@ final class StreamListener extends MediaStreamActionNotifyBase {
             });
     }
 
+    /**
+     * When the stream publishing stops, the recorder is stopped (if there was one)
+     * and pushing to publish host is stopped.
+     *
+     * @param stream Stream object
+     * @param name Stream name
+     * @param record Is stream being recorded
+     * @param append Is record being appended to an existing file
+     */
     @Override
     public void onUnPublish(IMediaStream stream, String name, boolean record, boolean append) {
         instance.getVHost().getLiveStreamRecordManager().stopRecording(instance, name);

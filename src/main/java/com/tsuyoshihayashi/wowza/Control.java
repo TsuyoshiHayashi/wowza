@@ -5,15 +5,19 @@ import com.wowza.wms.http.IHTTPResponse;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import static java.util.Collections.singletonMap;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
+ * Base class for the request handling subclasses for easier response generation
+ *
  * @author Alexey Donov
  */
 abstract class Control extends HTTPProvider2Base {
+    /**
+     * Action parameter is used in all request handlers
+     */
     static final String ACTION_PARAMETER_NAME = "a";
 
     void writeResponse(IHTTPResponse response, int code, String body, String contentType) {
@@ -24,7 +28,7 @@ abstract class Control extends HTTPProvider2Base {
                 response.getOutputStream().write(body.getBytes());
                 response.getOutputStream().close();
             } catch (IOException ignore) {
-
+                // No op
             }
         }
     }
