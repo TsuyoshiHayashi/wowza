@@ -93,6 +93,6 @@ public class RecorderControl extends Control {
                 break;
         }
 
-        writeResponse(response, 200, "{\"ok\": true}", APPLICATION_JSON);
+        writeOkResponse(response);
     }
 }

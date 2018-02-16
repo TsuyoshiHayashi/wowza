@@ -74,7 +74,7 @@ public final class FileControl extends Control {
                         //noinspection ResultOfMethodCallIgnored
                         file.delete();
                     }
-                    writeResponse(response, 200, "{\"ok\": true}", APPLICATION_JSON);
+                    writeOkResponse(response);
                     return;
 
                 default:

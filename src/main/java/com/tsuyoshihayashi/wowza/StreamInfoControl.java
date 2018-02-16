@@ -5,7 +5,6 @@ import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.vhost.IVHost;
-import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
 import java.util.Optional;
@@ -47,7 +46,7 @@ public class StreamInfoControl extends Control {
                 .map(application -> application.getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME))
                 .map(instance -> instance.getStreams().getStream(streamName))
                 .map(this::streamInfo)
-                .map(JSONAware::toJSONString)
+                .map(JSONObject::toString)
                 .orElse(null);
 
             writeResponse(response, 200, result, APPLICATION_JSON);

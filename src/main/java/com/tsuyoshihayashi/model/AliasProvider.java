@@ -34,10 +34,10 @@ public final class AliasProvider implements IMediaStreamNameAliasProvider {
         return cameraURLs.get(streamName);
     }
 
-    public void setCameraIP(String streamName, String ip) {
-        logger.info(String.format("Adding URL for camera: %s -> %s", streamName, ip));
+    public void setCameraURL(String streamName, String url) {
+        logger.info(String.format("Adding URL for camera: %s -> %s", streamName, url));
 
-        cameraURLs.put(streamName, ip);
+        cameraURLs.put(streamName, url);
     }
 
     @Override

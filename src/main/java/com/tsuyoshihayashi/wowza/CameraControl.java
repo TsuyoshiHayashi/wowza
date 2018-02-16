@@ -8,8 +8,13 @@ import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
 import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
+import com.wowza.wms.mediacaster.MediaCasterStreamItem;
 import com.wowza.wms.vhost.IVHost;
+import org.json.simple.JSONObject;
 
+import java.util.Collections;
+
+import static java.util.Collections.singletonMap;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
@@ -37,8 +42,8 @@ public final class CameraControl extends Control {
                 return;
             }
 
-            final String stream = request.getParameter(STREAM_PARAMETER_NAME);
-            if (stream == null || stream.isEmpty()) {
+            final String streamName = request.getParameter(STREAM_PARAMETER_NAME);
+            if (streamName == null || streamName.isEmpty()) {
                 writeBadRequestResponse(response);
                 return;
             }
@@ -48,22 +53,30 @@ public final class CameraControl extends Control {
 
             switch (action) {
                 case ACTION_START:
-                    final String ip = request.getParameter(IP_PARAMETER_NAME);
-                    if (ip == null || ip.isEmpty()) {
+                    final String url = request.getParameter(IP_PARAMETER_NAME);
+                    if (url == null || url.isEmpty()) {
                         writeBadRequestResponse(response);
                         return;
                     }
 
-                    logger.info(String.format("Starting camera stream=%s ip=%s", stream, ip));
+                    instance.getMediaCasterStreams()
+                        .getMediaCasterStreamItems()
+                        .stream()
+                        .map(MediaCasterStreamItem::getMediaCasterId)
+                        .filter(streamName::equals)
+                        .findAny()
+                        .ifPresent(instance::stopMediaCasterStream);
 
-                    AliasProvider.instance().setCameraIP(stream, ip);
-                    instance.startMediaCasterStream(stream, "rtp");
+                    logger.info(String.format("Starting camera stream=%s url=%s", streamName, url));
+                    AliasProvider.instance().setCameraURL(streamName, url);
+
+                    instance.startMediaCasterStream(streamName, "rtp");
                     break;
 
                 case ACTION_STOP:
-                    logger.info(String.format("Stopping camera stream=%s", stream));
+                    logger.info(String.format("Stopping camera stream=%s", streamName));
 
-                    instance.stopMediaCasterStream(stream);
+                    instance.stopMediaCasterStream(streamName);
                     break;
 
                 default:
@@ -71,7 +84,7 @@ public final class CameraControl extends Control {
                     return;
             }
 
-            writeResponse(response, 200, "{\"ok\": true}", APPLICATION_JSON);
+            writeOkResponse(response);
         } catch (Exception e) {
             writeResponse(response, 500, e.getMessage());
         }
