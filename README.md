@@ -81,6 +81,11 @@
                             <RequestFilters>stream_info*</RequestFilters>
                             <AuthenticationMethod>none</AuthenticationMethod>
                         </HTTPProvider>
+                        <HTTPProvider>
+                            <BaseClass>com.tsuyoshihayashi.wowza.PublishControl</BaseClass>
+                            <RequestFilters>publishctl*</RequestFilters>
+                            <AuthenticationMethod>none</AuthenticationMethod>                           
+                        </HTTPProvider>
                         ...
                     </HTTPProviders>
                 </HostPort>
