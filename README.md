@@ -124,4 +124,4 @@
 
 # Automatic deployment
 
-Alternatively, it is possible to automatically build and deploy the project using maven profiles. One profile is included in the ```pom.xml``` file. It allows for the project to be deployed to ```rec.publish52.videog.jp``` server. Before use, SSH private key file for this server must be present at ```~/.ssh/wowza_record1.pem``` path. The command to launch build & deploy process is ```mvn deploy -P 52```.
+Alternatively, steps 1–2 could be replaced with automatic build and deploy using maven profiles. One profile is included in the ```pom.xml``` file. It allows for the project to be deployed to ```rec.publish52.videog.jp``` server. Before use, SSH private key file for this server must be present at ```~/.ssh/wowza_record1.pem``` path. The command to launch build & deploy process is ```mvn deploy -P 52```.
