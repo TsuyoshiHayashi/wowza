@@ -1,8 +1,8 @@
 # Wowza Module installation
 
 1. In the project root directory run ```mvn package```
-2. Copy all JAR files from ```deploy``` directory to ```/usr/local/WowzaStreamingEngine/lib```
-3. Modify ```/usr/local/WowzaStreamingEngine/conf/<YOUR_APP>/Application.xml``` to include following information:
+2. Copy all JAR files from ```target``` directory to ```/usr/local/WowzaStreamingEngine/lib```
+3. Modify ```/usr/local/WowzaStreamingEngine/conf/live/Application.xml``` to include following information:
 
 ```xml
     <Root>
@@ -121,3 +121,7 @@
 ```
 
 6. Restart Wowza
+
+# Automatic deployment
+
+Alternatively, it is possible to automatically build and deploy the project using maven profiles. One profile is included in the ```pom.xml``` file. It allows for the project to be deployed to ```rec.publish52.videog.jp``` server. Before use, SSH private key file for this server must be present at ```~/.ssh/wowza_record1.pem``` path. The command to launch build & deploy process is ```mvn deploy -P 52```.
