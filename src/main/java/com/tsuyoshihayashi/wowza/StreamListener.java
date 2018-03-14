@@ -1,9 +1,7 @@
 package com.tsuyoshihayashi.wowza;
 
 import com.tsuyoshihayashi.model.RecordSettings;
-import com.wowza.wms.application.ApplicationInstance;
-import com.wowza.wms.application.IApplicationInstance;
-import com.wowza.wms.application.WMSProperties;
+import com.wowza.wms.application.*;
 import com.wowza.wms.livestreamrecord.manager.IStreamRecorderConstants;
 import com.wowza.wms.livestreamrecord.manager.StreamRecorderParameters;
 import com.wowza.wms.logging.WMSLogger;
@@ -12,6 +10,7 @@ import com.wowza.wms.pushpublish.protocol.rtmp.PushPublishRTMP;
 import com.wowza.wms.server.LicensingException;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.stream.MediaStreamActionNotifyBase;
+import com.wowza.wms.vhost.IVHost;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -129,7 +128,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
                 logger.info(String.format("Pushing %s stream to %s", stream.getName(), host));
                 try {
                     final PushPublishRTMP publisher = new PushPublishRTMP();
-                    publisher.setAppInstance(stream.getClient().getAppInstance());
+                    publisher.setAppInstance(instance);
                     publisher.setSrcStream(stream);
                     publisher.setHost(host);
                     publisher.setDstApplicationName(pushApp == null ? "live" : pushApp);
