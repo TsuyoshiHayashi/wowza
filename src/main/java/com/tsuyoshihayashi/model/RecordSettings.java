@@ -62,7 +62,7 @@ public final class RecordSettings {
             !manualStart,
             json.containsKey(UPLOAD_URL_KEY) ? json.get(UPLOAD_URL_KEY).toString() : null,
             json.get(HASH_KEY).toString(),
-            json.get(HASH2_KEY).toString(), referer);
+            json.get(HASH2_KEY) != null ? json.get(HASH2_KEY).toString() : "", referer);
     }
 
     public @NotNull String getFileNameFormat() {

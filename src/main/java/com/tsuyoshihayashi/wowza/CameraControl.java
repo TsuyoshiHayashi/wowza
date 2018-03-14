@@ -9,7 +9,11 @@ import com.wowza.wms.http.IHTTPResponse;
 import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.mediacaster.MediaCasterStreamItem;
+import com.wowza.wms.mediacaster.MediaCasterStreamMap;
 import com.wowza.wms.vhost.IVHost;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Object that handles requests to start/stop RTSP camera streaming
@@ -60,12 +64,10 @@ public final class CameraControl extends Control {
                     }
 
                     // If there is already a stream with this name, stop it
-                    instance.getMediaCasterStreams()
-                        .getMediaCasterStreamItems()
-                        .stream()
-                        .map(MediaCasterStreamItem::getMediaCasterId)
-                        .filter(streamName::equals)
-                        .findAny()
+                    Optional.ofNullable(instance.getMediaCasterStreams())
+                        .map(MediaCasterStreamMap::getMediaCasterStreamItems)
+                        .map(List::stream)
+                        .flatMap(stream -> stream.map(MediaCasterStreamItem::getMediaCasterId).filter(streamName::equals).findAny())
                         .ifPresent(instance::stopMediaCasterStream);
 
                     // Set the RTSP URL for the stream name
