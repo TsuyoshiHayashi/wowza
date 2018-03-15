@@ -1,0 +1,10 @@
+image: maven:3.3.9
+
+pipelines:
+  default:
+    - step:
+        deployment: production
+        caches:
+          - maven
+        script:
+          - mvn -B deploy -P 52
