@@ -10,7 +10,7 @@ import com.wowza.wms.pushpublish.protocol.rtmp.PushPublishRTMP;
 import com.wowza.wms.server.LicensingException;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.stream.MediaStreamActionNotifyBase;
-import com.wowza.wms.vhost.IVHost;
+import lombok.val;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -52,7 +52,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
 
         this.instance = instance;
 
-        final WMSProperties properties = instance.getProperties();
+        val properties = instance.getProperties();
 
         this.apiEndpoint = properties.getPropertyStr(API_ENDPOINT_KEY);
         this.uploadReferer = properties.getPropertyStr(UPLOAD_REFERER_KEY, "");
@@ -70,15 +70,15 @@ final class StreamListener extends MediaStreamActionNotifyBase {
      */
     private RecordSettings getRecordSettings(IMediaStream stream) {
         try {
-            final String responseText = client.target(apiEndpoint)
+            val responseText = client.target(apiEndpoint)
                 .queryParam(API_STREAM_NAME_PARAMETER_NAME, stream.getName())
                 .request()
                 .get(String.class);
 
             logger.info(String.format("API Response: %s", responseText));
 
-            final JSONObject response = (JSONObject) parser.parse(responseText);
-            final RecordSettings settings = fromJSON(response, uploadReferer);
+            val response = (JSONObject) parser.parse(responseText);
+            val settings = fromJSON(response, uploadReferer);
 
             logger.info(String.format("Record settings: autostart '%s', name '%s', split on %d minutes, upload to '%s'", settings.isAutoRecord(), settings.getFileNameFormat(), settings.getLimit(), settings.getUploadURL()));
 
@@ -110,7 +110,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
 
                 if (settings.isAutoRecord()) {
                     // If the stream recording should start immediately, do so
-                    final StreamRecorderParameters parameters = new StreamRecorderParameters(instance);
+                    val parameters = new StreamRecorderParameters(instance);
                     parameters.fileFormat = IStreamRecorderConstants.FORMAT_MP4;
                     parameters.segmentationType = IStreamRecorderConstants.SEGMENT_BY_DURATION;
                     parameters.segmentDuration = settings.getLimit() * 60 * 1000;
@@ -127,7 +127,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
             .ifPresent(host -> {
                 logger.info(String.format("Pushing %s stream to %s", stream.getName(), host));
                 try {
-                    final PushPublishRTMP publisher = new PushPublishRTMP();
+                    val publisher = new PushPublishRTMP();
                     publisher.setAppInstance(instance);
                     publisher.setSrcStream(stream);
                     publisher.setHost(host);

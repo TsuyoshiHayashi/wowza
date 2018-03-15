@@ -2,16 +2,14 @@ package com.tsuyoshihayashi.wowza;
 
 import com.tsuyoshihayashi.model.RecordSettings;
 import com.wowza.wms.application.ApplicationInstance;
-import com.wowza.wms.application.IApplicationInstance;
-import com.wowza.wms.application.WMSProperties;
 import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
 import com.wowza.wms.livestreamrecord.manager.IStreamRecorderConstants;
 import com.wowza.wms.livestreamrecord.manager.StreamRecorderParameters;
 import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
-import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.vhost.IVHost;
+import lombok.val;
 
 import java.util.Arrays;
 
@@ -38,21 +36,21 @@ public class RecorderControl extends Control {
         }
 
         // Ensure that action parameter is present in the request
-        final String action = request.getParameter(ACTION_PARAMETER_NAME);
+        val action = request.getParameter(ACTION_PARAMETER_NAME);
         if (action == null || !Arrays.asList(ACTION_START, ACTION_STOP).contains(action)) {
             writeBadRequestResponse(response);
             return;
         }
 
         // Ensure that stream name parameter is present in the request
-        final String streamName = request.getParameter(STREAM_PARAMETER_NAME);
+        val streamName = request.getParameter(STREAM_PARAMETER_NAME);
         if (streamName == null || streamName.isEmpty()) {
             writeBadRequestResponse(response);
             return;
         }
 
         // Ensure that the live application instance is running
-        final IApplicationInstance instance = host.getApplication("live").getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME);
+        val instance = host.getApplication("live").getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME);
         if (instance == null) {
             logger.warn("No live application instance");
             writeResponse(response, 500, "No live application instance");
@@ -60,7 +58,7 @@ public class RecorderControl extends Control {
         }
 
         // Ensure that the stream with requested name is present in the application instance
-        final IMediaStream stream = instance.getStreams().getStream(streamName);
+        val stream = instance.getStreams().getStream(streamName);
         if (stream == null) {
             logger.warn(String.format("Stream %s not found", streamName));
             writeResponse(response, 404, "Stream not found");
@@ -68,8 +66,8 @@ public class RecorderControl extends Control {
         }
 
         // Ensure that the stream has record settings information
-        final WMSProperties properties = stream.getProperties();
-        final RecordSettings settings = (RecordSettings) properties.getProperty(RECORD_SETTINGS_KEY);
+        val properties = stream.getProperties();
+        val settings = (RecordSettings) properties.getProperty(RECORD_SETTINGS_KEY);
         if (settings == null) {
             logger.warn(String.format("No record settings for %s", streamName));
             writeResponse(response, 404, "No record settings for stream");
@@ -79,7 +77,7 @@ public class RecorderControl extends Control {
         switch (action) {
             case ACTION_START:
                 // Create stream recorder parameters from the settings
-                final StreamRecorderParameters parameters = new StreamRecorderParameters(instance);
+                val parameters = new StreamRecorderParameters(instance);
                 parameters.fileFormat = IStreamRecorderConstants.FORMAT_MP4;
                 parameters.segmentationType = IStreamRecorderConstants.SEGMENT_BY_DURATION;
                 parameters.segmentDuration = settings.getLimit() * 60 * 1000;

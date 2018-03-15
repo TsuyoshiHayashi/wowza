@@ -1,10 +1,10 @@
 package com.tsuyoshihayashi.wowza;
 
-import com.wowza.wms.application.WMSProperties;
 import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.server.IServer;
 import com.wowza.wms.server.ServerNotifyBase;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,7 +61,7 @@ public class ServerListener extends ServerNotifyBase {
      * Check the list of files in the content directory and delete ones that are old
      */
     private void checkFiles() {
-        final File root = new File("/usr/local/WowzaStreamingEngine");
+        val root = new File("/usr/local/WowzaStreamingEngine");
 
         //noinspection ResultOfMethodCallIgnored
         Optional.ofNullable(root.listFiles(File::isFile))
@@ -87,7 +87,7 @@ public class ServerListener extends ServerNotifyBase {
      */
     @Override
     public void onServerInit(IServer server) {
-        final WMSProperties properties = server.getProperties();
+        val properties = server.getProperties();
         maxFileAge = properties.getPropertyLong(MAX_FILE_AGE_PROPERTY_NAME, 0);
 
         if (maxFileAge > 0) {

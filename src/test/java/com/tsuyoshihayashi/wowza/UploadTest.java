@@ -3,6 +3,7 @@ package com.tsuyoshihayashi.wowza;
 import com.tsuyoshihayashi.model.RecordSettings;
 import com.tsuyoshihayashi.model.SegmentInfo;
 import junit.framework.TestCase;
+import lombok.val;
 import org.joda.time.DateTime;
 
 import java.io.File;
@@ -19,18 +20,18 @@ public class UploadTest extends TestCase {
     private static final String ORIGINAL_FILE_NAME = "Blue-HD.mp4";
 
     public void testGetRecordedFile() {
-        final DateTime now = new DateTime();
-        final SegmentInfo segmentInfo = new SegmentInfo(now, 10000, 0, ORIGINAL_FILE_PATH, ORIGINAL_FILE_PATH.concat("/").concat(ORIGINAL_FILE_NAME));
-        final File originalFile = new File(ORIGINAL_FILE_PATH, ORIGINAL_FILE_NAME);
-        final File recordedFile = RecorderListener.getRecordedFile(segmentInfo);
+        val now = new DateTime();
+        val segmentInfo = new SegmentInfo(now, 10000, 0, ORIGINAL_FILE_PATH, ORIGINAL_FILE_PATH.concat("/").concat(ORIGINAL_FILE_NAME));
+        val originalFile = new File(ORIGINAL_FILE_PATH, ORIGINAL_FILE_NAME);
+        val recordedFile = RecorderListener.getRecordedFile(segmentInfo);
 
         assertEquals(originalFile, recordedFile);
     }
 
     public void testReplace() {
-        final String origin = "obs!2017_08_15_15_25_36-N-DD_HH_II_SS-DD_HH_II_SS.mp4";
+        val origin = "obs!2017_08_15_15_25_36-N-DD_HH_II_SS-DD_HH_II_SS.mp4";
 
-        final String newFileName = origin
+        val newFileName = origin
             .replaceAll("N", "" + 1)
             .replaceFirst("DD", "" + 10)
             .replaceFirst("HH", "" + 20)
@@ -45,10 +46,10 @@ public class UploadTest extends TestCase {
     }
 
     public void testCreateNewName() {
-        final DateTime end = new DateTime();
-        final DateTime start = end.minus(10000);
+        val end = new DateTime();
+        val start = end.minus(10000);
 
-        final String expected = ORIGINAL_FILE_PATH.concat("/").concat(FILE_NAME_FORMAT
+        val expected = ORIGINAL_FILE_PATH.concat("/").concat(FILE_NAME_FORMAT
             .replaceAll("N", String.format("%d", 0))
             .replaceFirst("DD", String.format("%02d", start.getDayOfMonth()))
             .replaceFirst("HH", String.format("%02d", start.getHourOfDay()))
@@ -59,9 +60,9 @@ public class UploadTest extends TestCase {
             .replaceFirst("II", String.format("%02d", end.getMinuteOfHour()))
             .replaceFirst("SS", String.format("%02d", end.getSecondOfMinute())));
 
-        final RecordSettings recordSettings = new RecordSettings(FILE_NAME_FORMAT, LIMIT_MINUTES, false, "", "", "", "", "", "");
-        final SegmentInfo segmentInfo = new SegmentInfo(end, 10000, 0, ORIGINAL_FILE_PATH, ORIGINAL_FILE_PATH.concat("/").concat(ORIGINAL_FILE_NAME));
-        final String actual = RecorderListener.createNewName(recordSettings, segmentInfo);
+        val recordSettings = new RecordSettings(FILE_NAME_FORMAT, LIMIT_MINUTES, false, "", "", "", "", "", "");
+        val segmentInfo = new SegmentInfo(end, 10000, 0, ORIGINAL_FILE_PATH, ORIGINAL_FILE_PATH.concat("/").concat(ORIGINAL_FILE_NAME));
+        val actual = RecorderListener.createNewName(recordSettings, segmentInfo);
 
         assertEquals(expected, actual);
     }

@@ -2,8 +2,6 @@ package com.tsuyoshihayashi.wowza;
 
 import com.tsuyoshihayashi.model.AliasProvider;
 import com.wowza.wms.application.ApplicationInstance;
-import com.wowza.wms.application.IApplication;
-import com.wowza.wms.application.IApplicationInstance;
 import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
 import com.wowza.wms.logging.WMSLogger;
@@ -11,6 +9,7 @@ import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.mediacaster.MediaCasterStreamItem;
 import com.wowza.wms.mediacaster.MediaCasterStreamMap;
 import com.wowza.wms.vhost.IVHost;
+import lombok.val;
 
 import java.util.List;
 import java.util.Optional;
@@ -51,13 +50,13 @@ public final class CameraControl extends Control {
                 return;
             }
 
-            final IApplication application = host.getApplication("live");
-            final IApplicationInstance instance = application.getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME);
+            val application = host.getApplication("live");
+            val instance = application.getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME);
 
             switch (action) {
                 case ACTION_START:
                     // Ensure that the camera RTSP URL parameter is present in the request
-                    final String url = request.getParameter(URL_PARAMETER_NAME);
+                    val url = request.getParameter(URL_PARAMETER_NAME);
                     if (url == null || url.isEmpty()) {
                         writeBadRequestResponse(response);
                         return;

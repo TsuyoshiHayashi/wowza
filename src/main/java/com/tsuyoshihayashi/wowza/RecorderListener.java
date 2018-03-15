@@ -2,17 +2,15 @@ package com.tsuyoshihayashi.wowza;
 
 import com.tsuyoshihayashi.model.SegmentInfo;
 import com.tsuyoshihayashi.model.RecordSettings;
-import com.wowza.wms.application.WMSProperties;
 import com.wowza.wms.livestreamrecord.manager.IStreamRecorder;
 import com.wowza.wms.livestreamrecord.manager.StreamRecorderActionNotifyBase;
 import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
-import com.wowza.wms.stream.IMediaStream;
+import lombok.val;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -22,7 +20,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -78,10 +75,10 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
      * @return File name
      */
     static String createNewName(RecordSettings recordSettings, SegmentInfo segmentInfo) {
-        final DateTime end = segmentInfo.getSegmentEndTime();
-        final DateTime start = end.minus(segmentInfo.getSegmentDuration());
+        val end = segmentInfo.getSegmentEndTime();
+        val start = end.minus(segmentInfo.getSegmentDuration());
 
-        final String newName = recordSettings.getFileNameFormat()
+        val newName = recordSettings.getFileNameFormat()
             .replaceAll("N", String.format("%d", segmentInfo.getSegmentNumber()))
             .replaceFirst("DD", String.format("%02d", start.getDayOfMonth()))
             .replaceFirst("HH", String.format("%02d", start.getHourOfDay()))
@@ -103,7 +100,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
      * @return File object with a final name
      */
     private static File renameFile(File oldFile, String newFileName) {
-        final File newFile = new File(newFileName);
+        val newFile = new File(newFileName);
 
         if (!oldFile.renameTo(newFile)) {
             throw new RuntimeException("Could not move file");
@@ -124,7 +121,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
             return String.format("No upload URL for [%s], skipping upload", file);
         }
 
-        final FormDataMultiPart form = new FormDataMultiPart();
+        val form = new FormDataMultiPart();
         form.field("hash", settings.getHash());
         form.field("hash2", settings.getHash2());
         form.field("title", Optional.ofNullable(settings.getTitle()).orElse(file.getName()));
@@ -132,12 +129,12 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
             .ifPresent(comment -> form.field("comment", comment));
         form.bodyPart(new FileDataBodyPart("video_file", file, new MediaType("video", "mp4")));
 
-        String endpoint = Optional.ofNullable(uploadOverrideEndpoint).orElse(settings.getUploadURL());
+        val endpoint = Optional.ofNullable(uploadOverrideEndpoint).orElse(settings.getUploadURL());
 
         logger.info(String.format("Uploading segment %s to %s", file.getName(), endpoint));
 
         try {
-            final String response = client.target(endpoint)
+            val response = client.target(endpoint)
                 .request()
                 .header("Referer", settings.getReferer())
                 .post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE))
@@ -160,14 +157,14 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
      */
     @Override
     public void onStartRecorder(IStreamRecorder recorder) {
-        final IMediaStream stream = recorder.getStream();
+        val stream = recorder.getStream();
         if (stream == null) {
             logger.warn("No recorder stream");
             return;
         }
 
-        final WMSProperties properties = stream.getProperties();
-        final RecordSettings settings = (RecordSettings) properties.getProperty(RECORD_SETTINGS_KEY);
+        val properties = stream.getProperties();
+        val settings = (RecordSettings) properties.getProperty(RECORD_SETTINGS_KEY);
 
         streamRecordSettings.put(recorder.getStreamName(), settings);
     }
@@ -190,23 +187,23 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
     @Override
     public void onSegmentEnd(IStreamRecorder recorder) {
         // Fetch the segment information
-        final SegmentInfo segmentInfo = getSegmentInfo(recorder);
-        final CompletableFuture<SegmentInfo> segmentInfoFuture = completedFuture(segmentInfo);
+        val segmentInfo = getSegmentInfo(recorder);
+        val segmentInfoFuture = completedFuture(segmentInfo);
 
         // Fetch the record settings
-        final RecordSettings recordSettings = getRecordSettings(recorder);
-        final CompletableFuture<RecordSettings> recordSettingsFuture = completedFuture(recordSettings);
+        val recordSettings = getRecordSettings(recorder);
+        val recordSettingsFuture = completedFuture(recordSettings);
 
         runAsync(() -> logger.info("Segment finished"));
 
         // Fetch the temporary file
-        final CompletableFuture<File> oldFileFuture = segmentInfoFuture.thenApply(RecorderListener::getRecordedFile);
+        val oldFileFuture = segmentInfoFuture.thenApply(RecorderListener::getRecordedFile);
 
         // Generate final file name according to the rules
-        final CompletableFuture<String> newFileNameFuture = recordSettingsFuture.thenCombine(segmentInfoFuture, RecorderListener::createNewName);
+        val newFileNameFuture = recordSettingsFuture.thenCombine(segmentInfoFuture, RecorderListener::createNewName);
 
         // Rename the file
-        final CompletableFuture<File> newFileFuture = oldFileFuture.thenCombine(newFileNameFuture, RecorderListener::renameFile);
+        val newFileFuture = oldFileFuture.thenCombine(newFileNameFuture, RecorderListener::renameFile);
 
         // Upload it and log the response
         newFileFuture.thenCombineAsync(recordSettingsFuture, RecorderListener::uploadFile)

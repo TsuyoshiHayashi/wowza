@@ -1,5 +1,7 @@
 package com.tsuyoshihayashi.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
@@ -9,6 +11,8 @@ import org.json.simple.JSONObject;
  *
  * @author Alexey Donov
  */
+@Data
+@AllArgsConstructor
 public final class RecordSettings {
     private static final String FILE_NAME_FORMAT_KEY = "record_name";
     private static final String LIMIT_KEY = "limit";
@@ -28,20 +32,6 @@ public final class RecordSettings {
     private final @NotNull String referer;
     private final @Nullable String title;
     private final @Nullable String comment;
-
-    public RecordSettings(@NotNull String fileNameFormat, long limit, boolean autoRecord, @Nullable String uploadURL, @NotNull String hash, @NotNull String hash2, @NotNull String referer, @Nullable String title, @Nullable String comment) {
-        super();
-
-        this.fileNameFormat = fileNameFormat;
-        this.limit = limit;
-        this.autoRecord = autoRecord;
-        this.uploadURL = uploadURL;
-        this.hash = hash;
-        this.hash2 = hash2;
-        this.referer = referer;
-        this.title = title;
-        this.comment = comment;
-    }
 
     /**
      * Create an instance from JSON response
@@ -71,41 +61,5 @@ public final class RecordSettings {
             json.get(HASH2_KEY) != null ? json.get(HASH2_KEY).toString() : "", referer,
             json.get(TITLE_KEY) != null ? json.get(TITLE_KEY).toString() : null,
             json.get(COMMENT_KEY) != null ? json.get(COMMENT_KEY).toString() : null);
-    }
-
-    public @NotNull String getFileNameFormat() {
-        return fileNameFormat;
-    }
-
-    public long getLimit() {
-        return limit;
-    }
-
-    public boolean isAutoRecord() {
-        return autoRecord;
-    }
-
-    public @Nullable String getUploadURL() {
-        return uploadURL;
-    }
-
-    public @NotNull String getHash() {
-        return hash;
-    }
-
-    public @NotNull String getHash2() {
-        return hash2;
-    }
-
-    public @NotNull String getReferer() {
-        return referer;
-    }
-
-    public @Nullable String getTitle() {
-        return title;
-    }
-
-    public @Nullable String getComment() {
-        return comment;
     }
 }

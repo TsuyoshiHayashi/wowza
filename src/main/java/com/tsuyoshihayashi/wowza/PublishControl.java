@@ -5,6 +5,7 @@ import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.vhost.IVHost;
+import lombok.val;
 import org.json.simple.JSONArray;
 
 import java.util.Collection;
@@ -29,7 +30,7 @@ public class PublishControl extends Control {
     }
 
     private JSONArray getJSONArray(Collection<String> strings) {
-        final JSONArray result = new JSONArray();
+        val result = new JSONArray();
         // noinspection unchecked
         result.addAll(strings);
 
@@ -45,7 +46,7 @@ public class PublishControl extends Control {
         }
 
         // Ensure that action parameter is present in the request
-        final String action = request.getParameter(ACTION_PARAMETER_NAME);
+        val action = request.getParameter(ACTION_PARAMETER_NAME);
         if (action == null || !singletonList(ACTION_LIST).contains(action)) {
             writeBadRequestResponse(response);
             return;
@@ -54,7 +55,7 @@ public class PublishControl extends Control {
         try {
             switch (action) {
                 case ACTION_LIST:
-                    final String result = Optional.ofNullable(host.getApplication("live"))
+                    val result = Optional.ofNullable(host.getApplication("live"))
                         .map(application -> application.getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME))
                         .map(instance -> instance.getStreams().getStreams())
                         .map(this::getStreamNames)

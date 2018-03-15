@@ -1,6 +1,7 @@
 package com.tsuyoshihayashi.model;
 
 import junit.framework.TestCase;
+import lombok.val;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -45,8 +46,7 @@ public class RecordSettingsTest extends TestCase {
      */
     public void testManualStart() {
         try {
-            RecordSettings rs;
-            rs = RecordSettings.fromJSON((JSONObject) parser.parse("{\"record_name\":\"\", \"limit\":0, \"hash\":\"hash\", \"hash2\":\"hash2\", \"manual_start\":1}"), "");
+            val rs = RecordSettings.fromJSON((JSONObject) parser.parse("{\"record_name\":\"\", \"limit\":0, \"hash\":\"hash\", \"hash2\":\"hash2\", \"manual_start\":1}"), "");
             assertFalse(rs.isAutoRecord());
         } catch (ParseException ignore) {
             fail("Must be parseable");

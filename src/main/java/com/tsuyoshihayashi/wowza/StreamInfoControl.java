@@ -5,6 +5,7 @@ import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.vhost.IVHost;
+import lombok.val;
 import org.json.simple.JSONObject;
 
 import java.util.Optional;
@@ -29,7 +30,7 @@ public class StreamInfoControl extends Control {
      */
     @SuppressWarnings("unchecked")
     private JSONObject streamInfo(IMediaStream stream) {
-        final JSONObject obj = new JSONObject();
+        val obj = new JSONObject();
         obj.put("total_bitrate", stream.getPublishBitrateAudio() + stream.getPublishBitrateVideo());
         obj.put("video_bitrate", stream.getPublishBitrateVideo());
         obj.put("audio_bitrate", stream.getPublishBitrateAudio());
@@ -47,14 +48,14 @@ public class StreamInfoControl extends Control {
             }
 
             // Ensure that stream name parameter is present in the request
-            final String streamName = request.getParameter(STREAM_NAME_PARAMETER_NAME);
+            val streamName = request.getParameter(STREAM_NAME_PARAMETER_NAME);
             if (isNull(streamName) || streamName.isEmpty()) {
                 writeBadRequestResponse(response);
                 return;
             }
 
             // Find the stream in Live application default instance and create a JSON response object
-            final String result = Optional.ofNullable(host.getApplication("live"))
+            val result = Optional.ofNullable(host.getApplication("live"))
                 .map(application -> application.getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME))
                 .map(instance -> instance.getStreams().getStream(streamName))
                 .map(this::streamInfo)
