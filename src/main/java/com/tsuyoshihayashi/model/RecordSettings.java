@@ -16,6 +16,8 @@ public final class RecordSettings {
     private static final String HASH_KEY = "hash";
     private static final String HASH2_KEY = "hash2";
     private static final String AUTO_RECORD_KEY = "manual_start";
+    private static final String TITLE_KEY = "title";
+    private static final String COMMENT_KEY = "comment";
 
     private final @NotNull String fileNameFormat;
     private final long limit;
@@ -24,8 +26,10 @@ public final class RecordSettings {
     private final @NotNull String hash;
     private final @NotNull String hash2;
     private final @NotNull String referer;
+    private final @Nullable String title;
+    private final @Nullable String comment;
 
-    public RecordSettings(@NotNull String fileNameFormat, long limit, boolean autoRecord, @Nullable String uploadURL, @NotNull String hash, @NotNull String hash2, @NotNull String referer) {
+    public RecordSettings(@NotNull String fileNameFormat, long limit, boolean autoRecord, @Nullable String uploadURL, @NotNull String hash, @NotNull String hash2, @NotNull String referer, @Nullable String title, @Nullable String comment) {
         super();
 
         this.fileNameFormat = fileNameFormat;
@@ -35,6 +39,8 @@ public final class RecordSettings {
         this.hash = hash;
         this.hash2 = hash2;
         this.referer = referer;
+        this.title = title;
+        this.comment = comment;
     }
 
     /**
@@ -62,7 +68,9 @@ public final class RecordSettings {
             !manualStart,
             json.containsKey(UPLOAD_URL_KEY) ? json.get(UPLOAD_URL_KEY).toString() : null,
             json.get(HASH_KEY).toString(),
-            json.get(HASH2_KEY) != null ? json.get(HASH2_KEY).toString() : "", referer);
+            json.get(HASH2_KEY) != null ? json.get(HASH2_KEY).toString() : "", referer,
+            json.get(TITLE_KEY) != null ? json.get(TITLE_KEY).toString() : null,
+            json.get(COMMENT_KEY) != null ? json.get(COMMENT_KEY).toString() : null);
     }
 
     public @NotNull String getFileNameFormat() {
@@ -91,5 +99,13 @@ public final class RecordSettings {
 
     public @NotNull String getReferer() {
         return referer;
+    }
+
+    public @Nullable String getTitle() {
+        return title;
+    }
+
+    public @Nullable String getComment() {
+        return comment;
     }
 }

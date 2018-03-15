@@ -127,8 +127,9 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
         final FormDataMultiPart form = new FormDataMultiPart();
         form.field("hash", settings.getHash());
         form.field("hash2", settings.getHash2());
-        form.field("title", file.getName());
-        form.field("comment", "");
+        form.field("title", Optional.ofNullable(settings.getTitle()).orElse(file.getName()));
+        Optional.ofNullable(settings.getComment())
+            .ifPresent(comment -> form.field("comment", comment));
         form.bodyPart(new FileDataBodyPart("video_file", file, new MediaType("video", "mp4")));
 
         String endpoint = Optional.ofNullable(uploadOverrideEndpoint).orElse(settings.getUploadURL());
