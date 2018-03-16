@@ -19,7 +19,7 @@
 
     <profiles>
         <profile>
-            <id>alexey-local</id>
+            <id>local</id>
             <properties>
                 <deploy.remote.host>rec.publish52.videog.jp</deploy.remote.host>
                 <deploy.key.path>~/.ssh/wowza_record1.pem</deploy.key.path>
@@ -33,15 +33,16 @@
                 <deploy.key.path>~/.ssh/id_rsa</deploy.key.path>
                 <deploy.key.passphrase/>
             </properties>
-            <repositories>
-                <repository>
-                    <id>hwdmedia-maven-repository-public</id>
-                    <url>https://bitbucket.org/hwdmedia/maven-repository-public/raw/master/release</url>
-                    <layout>default</layout>
-                </repository>
-            </repositories>
         </profile>
     </profiles>
+
+    <repositories>
+        <repository>
+            <id>hwdmedia-maven-repository-public</id>
+            <url>https://bitbucket.org/hwdmedia/maven-repository-public/raw/master/release</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
