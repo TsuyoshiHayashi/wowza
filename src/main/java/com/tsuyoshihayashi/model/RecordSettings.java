@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 
+import java.util.Optional;
+
 /**
  * Object that represents record settings received from API
  *
@@ -41,10 +43,10 @@ public final class RecordSettings {
      * @return Record settings from the JSON
      */
     public static RecordSettings fromJSON(@NotNull JSONObject json, @NotNull String referer) {
-        if (!json.containsKey(FILE_NAME_FORMAT_KEY) ||
-            !json.containsKey(LIMIT_KEY) ||
-            !json.containsKey(HASH_KEY) ||
-            !json.containsKey(HASH2_KEY)) {
+        if (json.get(FILE_NAME_FORMAT_KEY) == null ||
+            json.get(LIMIT_KEY) == null ||
+            json.get(HASH_KEY) == null ||
+            json.get(HASH2_KEY) == null) {
             throw new IllegalArgumentException("JSON Object is not full");
         }
 
@@ -56,10 +58,11 @@ public final class RecordSettings {
         return new RecordSettings(json.get(FILE_NAME_FORMAT_KEY).toString(),
             Long.parseLong(json.get(LIMIT_KEY).toString()),
             !manualStart,
-            json.containsKey(UPLOAD_URL_KEY) ? json.get(UPLOAD_URL_KEY).toString() : null,
+            Optional.ofNullable(json.get(UPLOAD_URL_KEY)).map(Object::toString).orElse(null),
             json.get(HASH_KEY).toString(),
-            json.get(HASH2_KEY) != null ? json.get(HASH2_KEY).toString() : "", referer,
-            json.get(TITLE_KEY) != null ? json.get(TITLE_KEY).toString() : null,
-            json.get(COMMENT_KEY) != null ? json.get(COMMENT_KEY).toString() : null);
+            json.get(HASH2_KEY).toString(),
+            referer,
+            Optional.ofNullable(json.get(TITLE_KEY)).map(Object::toString).orElse(null),
+            Optional.ofNullable(json.get(COMMENT_KEY)).map(Object::toString).orElse(null));
     }
 }
