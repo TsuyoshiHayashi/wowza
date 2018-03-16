@@ -7,4 +7,5 @@ pipelines:
         caches:
           - maven
         script:
+          - ls -l ~/.ssh
           - mvn -B deploy -P bitbucket
