@@ -1,11 +1,13 @@
 package com.tsuyoshihayashi.model;
 
+import com.sun.tools.javac.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -43,10 +45,10 @@ public final class RecordSettings {
      * @return Record settings from the JSON
      */
     public static RecordSettings fromJSON(@NotNull JSONObject json, @NotNull String referer) {
-        if (json.get(FILE_NAME_FORMAT_KEY) == null ||
-            json.get(LIMIT_KEY) == null ||
-            json.get(HASH_KEY) == null ||
-            json.get(HASH2_KEY) == null) {
+        if (List.of(FILE_NAME_FORMAT_KEY, LIMIT_KEY, HASH_KEY, HASH2_KEY)
+            .stream()
+            .map(json::get)
+            .anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("JSON Object is not full");
         }
 

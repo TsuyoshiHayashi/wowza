@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  *
  * @author Alexey Donov
  */
-public class ServerListener extends ServerNotifyBase {
+public final class ServerListener extends ServerNotifyBase {
     private static final String MAX_FILE_AGE_PROPERTY_NAME = "maxFileAge";
 
     private final WMSLogger logger = WMSLoggerFactory.getLogger(ServerListener.class);

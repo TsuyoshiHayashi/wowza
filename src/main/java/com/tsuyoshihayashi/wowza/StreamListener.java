@@ -131,7 +131,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
                     publisher.setAppInstance(instance);
                     publisher.setSrcStream(stream);
                     publisher.setHost(host);
-                    publisher.setDstApplicationName(pushApp == null ? "live" : pushApp);
+                    publisher.setDstApplicationName(Optional.ofNullable(pushApp).orElse("live"));
                     publisher.setDstAppInstanceName(ApplicationInstance.DEFAULT_APPINSTANCE_NAME);
                     publisher.setDstStreamName(stream.getName());
                     publisher.setConnectionFlashVerion(PushPublishRTMP.CURRENTFLASHVERSION);

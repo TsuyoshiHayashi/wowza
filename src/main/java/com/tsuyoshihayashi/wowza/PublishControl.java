@@ -20,7 +20,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
  *
  * @author Alexey Donov
  */
-public class PublishControl extends Control {
+public final class PublishControl extends Control {
     private static final String ACTION_LIST = "list";
 
     private Collection<String> getStreamNames(Collection<IMediaStream> streams) {

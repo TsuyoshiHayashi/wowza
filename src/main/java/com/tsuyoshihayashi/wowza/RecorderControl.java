@@ -20,7 +20,7 @@ import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
  *
  * @author Alexey Donov
  */
-public class RecorderControl extends Control {
+public final class RecorderControl extends Control {
     private static final String STREAM_PARAMETER_NAME = "s";
     private static final String ACTION_START = "start";
     private static final String ACTION_STOP = "stop";

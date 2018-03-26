@@ -18,7 +18,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
  *
  * @author Alexey Donov
  */
-public class StreamInfoControl extends Control {
+public final class StreamInfoControl extends Control {
     private static final String STREAM_NAME_PARAMETER_NAME = "s";
 
     /**
