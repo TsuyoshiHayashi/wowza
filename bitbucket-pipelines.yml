@@ -3,6 +3,7 @@ image: maven:3.3.9
 pipelines:
   default:
     - step:
+        name: Deploy to Production
         deployment: production
         caches:
           - maven
