@@ -18,6 +18,9 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 /**
  * Object that handles requests about the list of active streams
  *
+ * List of active streams
+ * http://hostname:1936/publishctl?a=list
+ *
  * @author Alexey Donov
  */
 public final class PublishControl extends Control {

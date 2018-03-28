@@ -16,6 +16,9 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 /**
  * Object that handles requests about stream bitrate information
  *
+ * Get stream information
+ * http://hostname:1935/stream_info?s=stream_name
+ *
  * @author Alexey Donov
  */
 public final class StreamInfoControl extends Control {

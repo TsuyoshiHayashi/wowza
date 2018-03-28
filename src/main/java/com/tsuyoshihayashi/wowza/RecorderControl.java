@@ -18,6 +18,12 @@ import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
 /**
  * Object that handles requests that control stream recording
  *
+ * Start recording
+ * http://hostname:1935/recordctrl?a=start&s=stream_name
+ *
+ * Stop recording
+ * http://hostname:1936/recordctrl?a=stop&s=stream_name
+ *
  * @author Alexey Donov
  */
 public final class RecorderControl extends Control {
