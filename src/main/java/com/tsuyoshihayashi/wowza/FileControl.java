@@ -19,10 +19,10 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
  * Object that handles requests about files present in the content directory
  *
  * Listing files
- * http://hostname:1935/filectl?a=list
+ * http://hostname:1935/filectrl?a=list
  *
  * Manually deleting a file
- * http://hostname:1935/filectl?a=delete&f=filename.mp4
+ * http://hostname:1935/filectrl?a=delete&f=filename.mp4
  *
  * @author Alexey Donov
  */

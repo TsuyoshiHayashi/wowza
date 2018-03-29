@@ -18,10 +18,10 @@ import java.util.Optional;
  * Object that handles requests to start/stop RTSP camera streaming
  *
  * Starting a stream
- * http://hostname:1935/cameractl?a=start&s=streamname&c=rtsp://camerahost/stream
+ * http://hostname:1935/cameractrl?a=start&s=streamname&c=rtsp://camerahost/stream
  *
  * Stopping a stream
- * http://hostname:1936/cameractl?a=stop&s=streamname
+ * http://hostname:1936/cameractrl?a=stop&s=streamname
  *
  * @author Alexey Donov
  */
