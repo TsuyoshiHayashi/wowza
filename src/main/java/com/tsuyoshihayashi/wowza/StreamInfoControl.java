@@ -6,6 +6,7 @@ import com.wowza.wms.http.IHTTPResponse;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.vhost.IVHost;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 
 import java.util.Optional;
@@ -32,7 +33,7 @@ public final class StreamInfoControl extends Control {
      * @return JSON object
      */
     @SuppressWarnings("unchecked")
-    private JSONObject streamInfo(IMediaStream stream) {
+    private @NotNull JSONObject streamInfo(@NotNull IMediaStream stream) {
         val obj = new JSONObject();
         obj.put("total_bitrate", stream.getPublishBitrateAudio() + stream.getPublishBitrateVideo());
         obj.put("video_bitrate", stream.getPublishBitrateVideo());

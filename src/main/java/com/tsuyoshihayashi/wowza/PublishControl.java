@@ -6,12 +6,12 @@ import com.wowza.wms.http.IHTTPResponse;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.vhost.IVHost;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 
 import java.util.Collection;
 import java.util.Optional;
 
-import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -26,13 +26,13 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public final class PublishControl extends Control {
     private static final String ACTION_LIST = "list";
 
-    private Collection<String> getStreamNames(Collection<IMediaStream> streams) {
+    private @NotNull Collection<String> getStreamNames(@NotNull Collection<IMediaStream> streams) {
         return streams.stream()
             .map(IMediaStream::getName)
             .collect(toList());
     }
 
-    private JSONArray getJSONArray(Collection<String> strings) {
+    private @NotNull JSONArray getJSONArray(@NotNull Collection<String> strings) {
         val result = new JSONArray();
         // noinspection unchecked
         result.addAll(strings);
@@ -50,7 +50,7 @@ public final class PublishControl extends Control {
 
         // Ensure that action parameter is present in the request
         val action = request.getParameter(ACTION_PARAMETER_NAME);
-        if (action == null || !singletonList(ACTION_LIST).contains(action)) {
+        if (action == null || action.isEmpty()) {
             writeBadRequestResponse(response);
             return;
         }

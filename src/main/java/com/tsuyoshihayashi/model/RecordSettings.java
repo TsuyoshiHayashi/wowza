@@ -43,7 +43,7 @@ public final class RecordSettings {
      * @param referer Referer domain name that made the request
      * @return Record settings from the JSON
      */
-    public static RecordSettings fromJSON(@NotNull JSONObject json, @NotNull String referer) {
+    public static @NotNull RecordSettings fromJSON(@NotNull JSONObject json, @NotNull String referer) {
         if (Stream.of(FILE_NAME_FORMAT_KEY, LIMIT_KEY, HASH_KEY, HASH2_KEY)
             .map(json::get)
             .anyMatch(Objects::isNull)) {

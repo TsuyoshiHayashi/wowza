@@ -11,6 +11,8 @@ import com.wowza.wms.server.LicensingException;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.stream.MediaStreamActionNotifyBase;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -37,17 +39,17 @@ final class StreamListener extends MediaStreamActionNotifyBase {
     private static final String PUBLISHER_PROPERTY_NAME = "publisher";
     private static final String API_STREAM_NAME_PARAMETER_NAME = "n";
 
-    private final WMSLogger logger = WMSLoggerFactory.getLogger(StreamListener.class);
-    private final JSONParser parser = new JSONParser();
-    private final Client client = ClientBuilder.newClient();
+    private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(StreamListener.class);
+    private final @NotNull JSONParser parser = new JSONParser();
+    private final @NotNull Client client = ClientBuilder.newClient();
 
-    private final IApplicationInstance instance;
-    private final String apiEndpoint;
-    private final String uploadReferer;
-    private final String pushHost;
-    private final String pushApp;
+    private final @NotNull IApplicationInstance instance;
+    private final @NotNull String apiEndpoint;
+    private final @NotNull String uploadReferer;
+    private final @Nullable String pushHost;
+    private final @Nullable String pushApp;
 
-    StreamListener(IApplicationInstance instance) {
+    StreamListener(@NotNull IApplicationInstance instance) {
         super();
 
         this.instance = instance;
@@ -68,7 +70,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
      * @param stream Stream object
      * @return Record settings object
      */
-    private RecordSettings getRecordSettings(IMediaStream stream) {
+    private @NotNull RecordSettings getRecordSettings(@NotNull IMediaStream stream) {
         try {
             val responseText = client.target(apiEndpoint)
                 .queryParam(API_STREAM_NAME_PARAMETER_NAME, stream.getName())

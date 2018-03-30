@@ -10,6 +10,7 @@ import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.vhost.IVHost;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -31,7 +32,7 @@ public final class RecorderControl extends Control {
     private static final String ACTION_START = "start";
     private static final String ACTION_STOP = "stop";
 
-    private final WMSLogger logger = WMSLoggerFactory.getLogger(RecorderControl.class);
+    private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(RecorderControl.class);
 
     @Override
     public void onHTTPRequest(IVHost host, IHTTPRequest request, IHTTPResponse response) {
@@ -43,7 +44,7 @@ public final class RecorderControl extends Control {
 
         // Ensure that action parameter is present in the request
         val action = request.getParameter(ACTION_PARAMETER_NAME);
-        if (action == null || !Arrays.asList(ACTION_START, ACTION_STOP).contains(action)) {
+        if (action == null || action.isEmpty()) {
             writeBadRequestResponse(response);
             return;
         }

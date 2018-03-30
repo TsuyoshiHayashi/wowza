@@ -25,18 +25,16 @@ import java.util.stream.Stream;
 public final class ServerListener extends ServerNotifyBase {
     private static final String MAX_FILE_AGE_PROPERTY_NAME = "maxFileAge";
 
-    private final WMSLogger logger = WMSLoggerFactory.getLogger(ServerListener.class);
+    private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(ServerListener.class);
 
     private long maxFileAge = 0;
 
-    @NotNull
-    private final ScheduledExecutorService pool = Executors.newScheduledThreadPool(1);
+    private final @NotNull ScheduledExecutorService pool = Executors.newScheduledThreadPool(1);
 
     /**
      * Variable that stores the checking schedule
      */
-    @Nullable
-    private ScheduledFuture fileCheckFuture = null;
+    private @Nullable ScheduledFuture fileCheckFuture = null;
 
     /**
      * Determine if the file is considered old
@@ -44,7 +42,7 @@ public final class ServerListener extends ServerNotifyBase {
      * @param file File object
      * @return true if the file is old
      */
-    private boolean tooOld(File file) {
+    private boolean tooOld(@NotNull File file) {
         return (System.currentTimeMillis() - file.lastModified()) / (1000 * 60 * 60 * 24) > maxFileAge;
     }
 
@@ -53,7 +51,7 @@ public final class ServerListener extends ServerNotifyBase {
      *
      * @param file File being deleted
      */
-    private void logDeletion(File file) {
+    private void logDeletion(@NotNull File file) {
         logger.info(String.format("File %s is too old, deleting", file.getName()));
     }
 
@@ -76,7 +74,7 @@ public final class ServerListener extends ServerNotifyBase {
      *
      * @param future Schedule object
      */
-    private void cancelFuture(ScheduledFuture future) {
+    private void cancelFuture(@NotNull ScheduledFuture future) {
         future.cancel(false);
     }
 

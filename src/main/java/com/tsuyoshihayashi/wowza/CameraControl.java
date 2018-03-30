@@ -1,6 +1,8 @@
 package com.tsuyoshihayashi.wowza;
 
 import com.tsuyoshihayashi.model.AliasProvider;
+import com.tsuyoshihayashi.model.CameraInfo;
+import com.tsuyoshihayashi.model.TextAction;
 import com.wowza.wms.application.ApplicationInstance;
 import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
@@ -10,6 +12,7 @@ import com.wowza.wms.mediacaster.MediaCasterStreamItem;
 import com.wowza.wms.mediacaster.MediaCasterStreamMap;
 import com.wowza.wms.vhost.IVHost;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,8 +33,11 @@ public final class CameraControl extends Control {
     private static final String ACTION_STOP = "stop";
     private static final String STREAM_PARAMETER_NAME = "s";
     private static final String URL_PARAMETER_NAME = "c";
+    private static final String TITLE_PARAMETER_NAME = "title";
+    private static final String COMMENT_PARAMETER_NAME = "comment";
+    private static final String ACTION_TEXT_ACTION = "act";
 
-    private final WMSLogger logger = WMSLoggerFactory.getLogger(CameraControl.class);
+    private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(CameraControl.class);
 
     @Override
     public void onHTTPRequest(IVHost host, IHTTPRequest request, IHTTPResponse response) {
@@ -43,14 +49,14 @@ public final class CameraControl extends Control {
             }
 
             // Ensure that the action parameter is present in the request
-            final String action = request.getParameter(ACTION_PARAMETER_NAME);
+            val action = request.getParameter(ACTION_PARAMETER_NAME);
             if (action == null || action.isEmpty()) {
                 writeBadRequestResponse(response);
                 return;
             }
 
             // Ensure that the stream name parameter is present in the request
-            final String streamName = request.getParameter(STREAM_PARAMETER_NAME);
+            val streamName = request.getParameter(STREAM_PARAMETER_NAME);
             if (streamName == null || streamName.isEmpty()) {
                 writeBadRequestResponse(response);
                 return;
@@ -75,8 +81,20 @@ public final class CameraControl extends Control {
                         .flatMap(stream -> stream.map(MediaCasterStreamItem::getMediaCasterId).filter(streamName::equals).findAny())
                         .ifPresent(instance::stopMediaCasterStream);
 
-                    // Set the RTSP URL for the stream name
-                    AliasProvider.instance().setCameraURL(streamName, url);
+                    // Set the camera info object for the stream name
+                    val title = request.getParameter(TITLE_PARAMETER_NAME);
+                    val comment = request.getParameter(COMMENT_PARAMETER_NAME);
+                    val textActionString = request.getParameter(ACTION_TEXT_ACTION);
+                    TextAction textAction = null;
+                    if (textActionString != null && !textActionString.isEmpty()) {
+                        try {
+                            textAction = TextAction.valueOf(textActionString);
+                        } catch (IllegalArgumentException ignore) {
+                            // No op
+                        }
+                    }
+                    val info = new CameraInfo(url, title, comment, textAction);
+                    AliasProvider.instance().setCameraInfo(streamName, info);
 
                     // Start the streaming
                     logger.info(String.format("Starting camera stream=%s url=%s", streamName, url));

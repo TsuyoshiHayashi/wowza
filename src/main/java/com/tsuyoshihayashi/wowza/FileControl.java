@@ -6,6 +6,7 @@ import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.vhost.IVHost;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -33,7 +34,7 @@ public final class FileControl extends Control {
 
     private static final String CONTENT_ROOT = "/usr/local/WowzaStreamingEngine/content";
 
-    private final WMSLogger logger = WMSLoggerFactory.getLogger(FileControl.class);
+    private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(FileControl.class);
 
     /**
      * Create a single file response entry
@@ -42,7 +43,7 @@ public final class FileControl extends Control {
      * @return JSON object with name, size and date information
      */
     @SuppressWarnings("unchecked")
-    private JSONObject fileData(File file) {
+    private @NotNull JSONObject fileData(@NotNull File file) {
         val result = new JSONObject();
         result.put("name", file.getName());
         result.put("size", file.length());

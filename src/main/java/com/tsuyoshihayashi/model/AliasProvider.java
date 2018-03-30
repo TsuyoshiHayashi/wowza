@@ -4,9 +4,13 @@ import com.wowza.wms.application.IApplicationInstance;
 import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.stream.IMediaStreamNameAliasProvider;
+import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Object that provides RTSP camera URLs for stream names.
@@ -17,9 +21,9 @@ public final class AliasProvider implements IMediaStreamNameAliasProvider {
     /**
      * Singleton instance
      */
-    private static AliasProvider instance = null;
+    private static @Nullable AliasProvider instance = null;
 
-    public static AliasProvider instance() {
+    public static @NotNull AliasProvider instance() {
         if (instance == null) {
             instance = new AliasProvider();
         }
@@ -27,37 +31,37 @@ public final class AliasProvider implements IMediaStreamNameAliasProvider {
         return instance;
     }
 
-    private final WMSLogger logger = WMSLoggerFactory.getLogger(AliasProvider.class);
+    private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(AliasProvider.class);
 
     /**
-     * Map dictionary that stores associations of stream names with RTSP URLs
+     * Map dictionary that stores associations of stream names with camera information objects
      */
-    private final Map<String, String> cameraURLs = new HashMap<>();
+    private final @NotNull Map<String, CameraInfo> cameraInfos = new HashMap<>();
 
     private AliasProvider() {
-
+        // No op
     }
 
     /**
-     * Get a RTSP URL for the stream name
+     * Get camera information object for the stream name
      *
      * @param streamName Stream name
      * @return RTSP URL
      */
-    private String getCameraURL(String streamName) {
-        return cameraURLs.get(streamName);
+    private @Nullable CameraInfo getCameraInfo(@NotNull String streamName) {
+        return cameraInfos.get(streamName);
     }
 
     /**
-     * Associate a RTSP URL with a stream name
+     * Associate camera information object with a stream name
      *
      * @param streamName Stream name
-     * @param url RTSP URL
+     * @param info Camera information object
      */
-    public void setCameraURL(String streamName, String url) {
-        logger.info(String.format("Adding URL for camera: %s -> %s", streamName, url));
+    public void setCameraInfo(@NotNull String streamName, @Nullable CameraInfo info) {
+        logger.info(String.format("Adding URL for camera: %s -> %s", streamName, info));
 
-        cameraURLs.put(streamName, url);
+        cameraInfos.put(streamName, info);
     }
 
     /**
@@ -81,9 +85,12 @@ public final class AliasProvider implements IMediaStreamNameAliasProvider {
      */
     @Override
     public String resolveStreamAlias(IApplicationInstance instance, String name) {
-        final String url = getCameraURL(name);
-        logger.info(String.format("Resolving camera URL: %s -> %s", name, url));
+        val info = getCameraInfo(name);
 
-        return url;
+        logger.info(String.format("Resolving camera information: %s -> %s", name, info));
+
+        return Optional.ofNullable(info)
+            .map(CameraInfo::getUrl)
+            .orElse(null);
     }
 }

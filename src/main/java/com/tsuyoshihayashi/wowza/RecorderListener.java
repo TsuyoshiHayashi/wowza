@@ -10,6 +10,7 @@ import lombok.val;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.ws.rs.client.Client;
@@ -43,7 +44,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
      * @param recorder Stream recorder
      * @return RecordSettings object
      */
-    private static RecordSettings getRecordSettings(IStreamRecorder recorder) {
+    private static @Nullable RecordSettings getRecordSettings(@NotNull IStreamRecorder recorder) {
         return streamRecordSettings.get(recorder.getStreamName());
     }
 
@@ -53,7 +54,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
      * @param recorder Stream recorder
      * @return SegmentInfo object
      */
-    private static SegmentInfo getSegmentInfo(IStreamRecorder recorder) {
+    private static @NotNull SegmentInfo getSegmentInfo(@NotNull IStreamRecorder recorder) {
         return new SegmentInfo(recorder);
     }
 
@@ -63,7 +64,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
      * @param segmentInfo Segment information
      * @return File object
      */
-    static File getRecordedFile(SegmentInfo segmentInfo) {
+    static @NotNull File getRecordedFile(@NotNull SegmentInfo segmentInfo) {
         return new File(segmentInfo.getCurrentFile());
     }
 
@@ -74,7 +75,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
      * @param segmentInfo Current segment information
      * @return File name
      */
-    static String createNewName(RecordSettings recordSettings, SegmentInfo segmentInfo) {
+    static @NotNull String createNewName(@NotNull RecordSettings recordSettings, @NotNull SegmentInfo segmentInfo) {
         val end = segmentInfo.getSegmentEndTime();
         val start = end.minus(segmentInfo.getSegmentDuration());
 
@@ -99,7 +100,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
      * @param newFileName Final file name
      * @return File object with a final name
      */
-    private static File renameFile(File oldFile, String newFileName) {
+    private static @NotNull File renameFile(@NotNull File oldFile, @NotNull String newFileName) {
         val newFile = new File(newFileName);
 
         if (!oldFile.renameTo(newFile)) {
@@ -116,7 +117,7 @@ final class RecorderListener extends StreamRecorderActionNotifyBase {
      * @param settings RecordSettings object
      * @return Response from API as a string
      */
-    private static String uploadFile(File file, RecordSettings settings) {
+    private static @NotNull String uploadFile(@NotNull File file, @NotNull RecordSettings settings) {
         if (settings.getUploadURL() == null) {
             return String.format("No upload URL for [%s], skipping upload", file);
         }
