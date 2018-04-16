@@ -178,7 +178,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <scp remotetodir="${deploy.remote.username}@${deploy.remote.host}:${deploy.remote.dir}" keyfile="${deploy.key.path}" passphrase="${deploy.key.passphrase}" trust="yes" compressed="true" verbose="true">
+                                <scp remotetodir="${deploy.remote.username}@${deploy.remote.host}:${deploy.remote.dir}" port="${deploy.remote.port}" keyfile="${deploy.key.path}" passphrase="${deploy.key.passphrase}" trust="yes" compressed="true" verbose="true">
                                     <fileset dir="${project.build.directory}">
                                         <include name="*.jar"/>
                                     </fileset>
