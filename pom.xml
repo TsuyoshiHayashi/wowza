@@ -13,7 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <deploy.remote.username>ec2-user</deploy.remote.username>
+        <deploy.remote.username>lduser01</deploy.remote.username>
         <deploy.remote.dir>/usr/local/WowzaStreamingEngine/lib</deploy.remote.dir>
     </properties>
 
@@ -21,17 +21,19 @@
         <profile>
             <id>local</id>
             <properties>
-                <deploy.remote.host>rec.publish52.videog.jp</deploy.remote.host>
-                <deploy.key.path>~/.ssh/wowza_record1.pem</deploy.key.path>
-                <deploy.key.passphrase/>
+                <deploy.remote.host>202.231.198.247</deploy.remote.host>
+                <deploy.remote.port>5022</deploy.remote.port>
+                <deploy.key.path>~/.ssh/lduser01.key</deploy.key.path>
+                <deploy.key.passphrase>eicooSie3Foa</deploy.key.passphrase>
             </properties>
         </profile>
         <profile>
             <id>bitbucket</id>
             <properties>
-                <deploy.remote.host>rec.publish52.videog.jp</deploy.remote.host>
+                <deploy.remote.host>202.231.198.247</deploy.remote.host>
+                <deploy.remote.port>5022</deploy.remote.port>
                 <deploy.key.path>~/.ssh/id_rsa</deploy.key.path>
-                <deploy.key.passphrase/>
+                <deploy.key.passphrase>eicooSie3Foa</deploy.key.passphrase>
             </properties>
         </profile>
     </profiles>
