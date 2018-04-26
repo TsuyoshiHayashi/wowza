@@ -48,7 +48,7 @@ public final class AliasProvider implements IMediaStreamNameAliasProvider {
      * @param streamName Stream name
      * @return RTSP URL
      */
-    private @Nullable CameraInfo getCameraInfo(@NotNull String streamName) {
+    public @Nullable CameraInfo getCameraInfo(@NotNull String streamName) {
         return cameraInfos.get(streamName);
     }
 

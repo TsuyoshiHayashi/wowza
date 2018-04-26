@@ -1,5 +1,6 @@
 package com.tsuyoshihayashi.wowza;
 
+import com.tsuyoshihayashi.model.AliasProvider;
 import com.tsuyoshihayashi.model.RecordSettings;
 import com.wowza.wms.application.*;
 import com.wowza.wms.livestreamrecord.manager.IStreamRecorderConstants;
@@ -19,6 +20,7 @@ import org.json.simple.parser.ParseException;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 
 import java.util.Optional;
 
@@ -38,6 +40,9 @@ final class StreamListener extends MediaStreamActionNotifyBase {
     private static final String PUSH_APP_KEY = "pushApp";
     private static final String PUBLISHER_PROPERTY_NAME = "publisher";
     private static final String API_STREAM_NAME_PARAMETER_NAME = "n";
+    private static final String API_TITLE_PARAMETER_NAME = "title";
+    private static final String API_COMMENT_PARAMETER_NAME = "comment";
+    private static final String API_ACTION_PARAMETER_NAME = "act";
 
     private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(StreamListener.class);
     private final @NotNull JSONParser parser = new JSONParser();
@@ -72,10 +77,23 @@ final class StreamListener extends MediaStreamActionNotifyBase {
      */
     private @NotNull RecordSettings getRecordSettings(@NotNull IMediaStream stream) {
         try {
-            val responseText = client.target(apiEndpoint)
-                .queryParam(API_STREAM_NAME_PARAMETER_NAME, stream.getName())
-                .request()
-                .get(String.class);
+            WebTarget target = client.target(apiEndpoint)
+                .queryParam(API_STREAM_NAME_PARAMETER_NAME, stream.getName());
+
+            val cameraInfo = AliasProvider.instance().getCameraInfo(stream.getName());
+            if (cameraInfo != null) {
+                if (cameraInfo.getTextAction() != null) {
+                    target = target.queryParam(API_ACTION_PARAMETER_NAME, cameraInfo.getTextAction().toString());
+                }
+                if (cameraInfo.getTitle() != null) {
+                    target = target.queryParam(API_TITLE_PARAMETER_NAME, cameraInfo.getTitle());
+                }
+                if (cameraInfo.getComment() != null) {
+                    target = target.queryParam(API_COMMENT_PARAMETER_NAME, cameraInfo.getComment());
+                }
+            }
+
+            val responseText = target.request().get(String.class);
 
             logger.info(String.format("API Response: %s", responseText));
 
