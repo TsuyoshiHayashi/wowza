@@ -60,7 +60,7 @@ public class UploadTest extends TestCase {
             .replaceFirst("II", String.format("%02d", end.getMinuteOfHour()))
             .replaceFirst("SS", String.format("%02d", end.getSecondOfMinute())));
 
-        val recordSettings = new RecordSettings(FILE_NAME_FORMAT, LIMIT_MINUTES, false, "", "", "", "", "", "");
+        val recordSettings = new RecordSettings(FILE_NAME_FORMAT, LIMIT_MINUTES, false, "", "", "", "", "", "", "");
         val segmentInfo = new SegmentInfo(end, 10000, 0, ORIGINAL_FILE_PATH, ORIGINAL_FILE_PATH.concat("/").concat(ORIGINAL_FILE_NAME));
         val actual = RecorderListener.createNewName(recordSettings, segmentInfo);
 
