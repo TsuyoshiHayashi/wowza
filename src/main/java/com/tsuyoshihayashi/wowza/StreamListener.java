@@ -93,6 +93,8 @@ final class StreamListener extends MediaStreamActionNotifyBase {
                 }
             }
 
+            logger.info(String.format("API Request URL: %s", target.getUri()));
+
             val responseText = target.request().get(String.class);
 
             logger.info(String.format("API Response: %s", responseText));
@@ -100,7 +102,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
             val response = (JSONObject) parser.parse(responseText);
             val settings = fromJSON(response, uploadReferer);
 
-            logger.info(String.format("Record settings: autostart '%s', name '%s', split on %d minutes, upload to '%s'", settings.isAutoRecord(), settings.getFileNameFormat(), settings.getLimit(), settings.getUploadURL()));
+            logger.info(String.format("Record settings: %s", settings));
 
             return settings;
         } catch (ParseException e) {
