@@ -21,16 +21,6 @@
             <Properties>
                 ...
                 <Property>
-                    <Name>apiEndpoint</Name>
-                    <Value>http://www.videog.jp/system/api/ajax/w4/wowza_api_sample.php</Value>
-                    <Type>String</Type>
-                </Property>
-                <Property>
-                    <Name>uploadReferer</Name>
-                    <Value>http://logic-design.jp/</Value>
-                    <Type>String</Type>
-                </Property>
-                <Property>
                     <Name>pushHost</Name>
                     <Value>publish52.videog.jp</Value>
                     <Type>String</Type>
@@ -44,7 +34,7 @@
                 -->
                 ...
             </Properties>
-            ...        
+            ...
         </Application>
     </Root>
 ```
@@ -84,12 +74,26 @@
                         <HTTPProvider>
                             <BaseClass>com.tsuyoshihayashi.wowza.PublishControl</BaseClass>
                             <RequestFilters>publishctl*</RequestFilters>
-                            <AuthenticationMethod>none</AuthenticationMethod>                           
+                            <AuthenticationMethod>none</AuthenticationMethod>
                         </HTTPProvider>
                         ...
                     </HTTPProviders>
                 </HostPort>
             </HostPortList>
+            ...
+            <Properties>
+                <Property>
+                    <Name>apiEndpoint</Name>
+                    <Value>http://www.videog.jp/system/api/ajax/w4/wowza_api_sample.php</Value>
+                    <Type>String</Type>
+                </Property>
+                <Property>
+                    <Name>uploadReferer</Name>
+                    <Value>http://logic-design.jp/</Value>
+                    <Type>String</Type>
+                </Property>
+            </Properties>
+            ...
         </VHost>
     </Root>
 ```
