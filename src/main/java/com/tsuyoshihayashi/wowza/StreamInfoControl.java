@@ -3,6 +3,8 @@ package com.tsuyoshihayashi.wowza;
 import com.wowza.wms.application.ApplicationInstance;
 import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
+import com.wowza.wms.logging.WMSLogger;
+import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.vhost.IVHost;
 import lombok.val;
@@ -25,6 +27,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public final class StreamInfoControl extends Control {
     private static final String STREAM_NAME_PARAMETER_NAME = "s";
 
+    private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(StreamInfoControl.class);
+
     /**
      * Create a JSON entry about the stream, containing
      * video, audio and total bitrates.
@@ -44,6 +48,8 @@ public final class StreamInfoControl extends Control {
 
     @Override
     public void onHTTPRequest(IVHost host, IHTTPRequest request, IHTTPResponse response) {
+        logRequest(request, logger);
+
         try {
             // Ensure that this is a GET request
             if (!"GET".equals(request.getMethod())) {

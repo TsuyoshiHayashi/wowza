@@ -41,6 +41,8 @@ public final class CameraControl extends Control {
 
     @Override
     public void onHTTPRequest(IVHost host, IHTTPRequest request, IHTTPResponse response) {
+        logRequest(request, logger);
+
         try {
             logger.info("Received camera command with parameters: " + request.getParameterMap().toString());
 

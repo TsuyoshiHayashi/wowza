@@ -3,6 +3,8 @@ package com.tsuyoshihayashi.wowza;
 import com.wowza.wms.application.ApplicationInstance;
 import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
+import com.wowza.wms.logging.WMSLogger;
+import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.vhost.IVHost;
 import lombok.val;
@@ -26,6 +28,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public final class PublishControl extends Control {
     private static final String ACTION_LIST = "list";
 
+    private final WMSLogger logger = WMSLoggerFactory.getLogger(PublishControl.class);
+
     private @NotNull Collection<String> getStreamNames(@NotNull Collection<IMediaStream> streams) {
         return streams.stream()
             .map(IMediaStream::getName)
@@ -42,6 +46,8 @@ public final class PublishControl extends Control {
 
     @Override
     public void onHTTPRequest(IVHost host, IHTTPRequest request, IHTTPResponse response) {
+        logRequest(request, logger);
+
         // Ensure that this is a GET request
         if (!"GET".equals(request.getMethod())) {
             writeBadRequestResponse(response);

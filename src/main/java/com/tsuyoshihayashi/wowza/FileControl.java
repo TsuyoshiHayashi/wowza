@@ -55,6 +55,8 @@ public final class FileControl extends Control {
     @SuppressWarnings("unchecked")
     @Override
     public void onHTTPRequest(IVHost host, IHTTPRequest request, IHTTPResponse response) {
+        logRequest(request, logger);
+
         try {
             // Ensure this is a GET request
             if (!"GET".equals(request.getMethod())) {

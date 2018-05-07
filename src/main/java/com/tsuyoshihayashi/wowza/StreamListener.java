@@ -1,7 +1,6 @@
 package com.tsuyoshihayashi.wowza;
 
-import com.tsuyoshihayashi.model.AliasProvider;
-import com.tsuyoshihayashi.model.RecordSettings;
+import com.tsuyoshihayashi.api.RecordSettingsEndpoint;
 import com.wowza.wms.application.*;
 import com.wowza.wms.livestreamrecord.manager.IStreamRecorderConstants;
 import com.wowza.wms.livestreamrecord.manager.StreamRecorderParameters;
@@ -14,17 +13,9 @@ import com.wowza.wms.stream.MediaStreamActionNotifyBase;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 
 import java.util.Optional;
 
-import static com.tsuyoshihayashi.model.RecordSettings.fromJSON;
 import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
@@ -39,75 +30,32 @@ final class StreamListener extends MediaStreamActionNotifyBase {
     private static final String PUSH_HOST_KEY = "pushHost";
     private static final String PUSH_APP_KEY = "pushApp";
     private static final String PUBLISHER_PROPERTY_NAME = "publisher";
-    private static final String API_STREAM_NAME_PARAMETER_NAME = "n";
-    private static final String API_TITLE_PARAMETER_NAME = "title";
-    private static final String API_COMMENT_PARAMETER_NAME = "comment";
-    private static final String API_ACTION_PARAMETER_NAME = "act";
 
     private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(StreamListener.class);
-    private final @NotNull JSONParser parser = new JSONParser();
-    private final @NotNull Client client = ClientBuilder.newClient();
 
     private final @NotNull IApplicationInstance instance;
-    private final @NotNull String apiEndpoint;
-    private final @NotNull String uploadReferer;
     private final @Nullable String pushHost;
     private final @Nullable String pushApp;
+
+    private final @NotNull RecordSettingsEndpoint recordSettingsEndpoint;
 
     StreamListener(@NotNull IApplicationInstance instance) {
         super();
 
         this.instance = instance;
 
-        val properties = instance.getProperties();
+        val instanceProperties = instance.getProperties();
+        this.pushHost = instanceProperties.getPropertyStr(PUSH_HOST_KEY);
+        this.pushApp = instanceProperties.getPropertyStr(PUSH_APP_KEY);
 
-        this.apiEndpoint = properties.getPropertyStr(API_ENDPOINT_KEY);
-        this.uploadReferer = properties.getPropertyStr(UPLOAD_REFERER_KEY, "");
-        this.pushHost = properties.getPropertyStr(PUSH_HOST_KEY);
-        this.pushApp = properties.getPropertyStr(PUSH_APP_KEY);
+        val host = instance.getVHost();
+        val hostProperties = host.getProperties();
+
+        val apiEndpoint = hostProperties.getPropertyStr(API_ENDPOINT_KEY);
+        val uploadReferer = hostProperties.getPropertyStr(UPLOAD_REFERER_KEY, "");
+        recordSettingsEndpoint = new RecordSettingsEndpoint(apiEndpoint, uploadReferer);
 
         logger.info(String.format("API Endpoint: %s", apiEndpoint));
-    }
-
-    /**
-     * Ask API to return record settings for the stream
-     *
-     * @param stream Stream object
-     * @return Record settings object
-     */
-    private @NotNull RecordSettings getRecordSettings(@NotNull IMediaStream stream) {
-        try {
-            WebTarget target = client.target(apiEndpoint)
-                .queryParam(API_STREAM_NAME_PARAMETER_NAME, stream.getName());
-
-            val cameraInfo = AliasProvider.instance().getCameraInfo(stream.getName());
-            if (cameraInfo != null) {
-                if (cameraInfo.getTextAction() != null) {
-                    target = target.queryParam(API_ACTION_PARAMETER_NAME, cameraInfo.getTextAction().toString());
-                }
-                if (cameraInfo.getTitle() != null) {
-                    target = target.queryParam(API_TITLE_PARAMETER_NAME, cameraInfo.getTitle());
-                }
-                if (cameraInfo.getComment() != null) {
-                    target = target.queryParam(API_COMMENT_PARAMETER_NAME, cameraInfo.getComment());
-                }
-            }
-
-            logger.info(String.format("API Request URL: %s", target.getUri()));
-
-            val responseText = target.request().get(String.class);
-
-            logger.info(String.format("API Response: %s", responseText));
-
-            val response = (JSONObject) parser.parse(responseText);
-            val settings = fromJSON(response, uploadReferer);
-
-            logger.info(String.format("Record settings: %s", settings));
-
-            return settings;
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     // IMediaStreamActionNotify
@@ -125,7 +73,7 @@ final class StreamListener extends MediaStreamActionNotifyBase {
     public void onPublish(IMediaStream stream, String name, boolean record, boolean append) {
         completedFuture(stream)
             // Fetch the record settings
-            .thenApply(this::getRecordSettings)
+            .thenApply(recordSettingsEndpoint::getRecordSettings)
             .thenAccept(settings -> {
                 // Store the settings in the stream object
                 stream.getProperties().setProperty(RECORD_SETTINGS_KEY, settings);

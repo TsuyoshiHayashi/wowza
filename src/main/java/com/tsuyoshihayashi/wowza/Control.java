@@ -1,7 +1,9 @@
 package com.tsuyoshihayashi.wowza;
 
 import com.wowza.wms.http.HTTPProvider2Base;
+import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
+import com.wowza.wms.logging.WMSLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
@@ -21,6 +23,10 @@ abstract class Control extends HTTPProvider2Base {
      * Action parameter is used in all request handlers
      */
     static final String ACTION_PARAMETER_NAME = "a";
+
+    void logRequest(@NotNull IHTTPRequest request, @NotNull WMSLogger logger) {
+        logger.info(String.format("Request registered: %s %s, params: %s", request.getMethod(), request.getPath(), request.getParameterMap()));
+    }
 
     void writeResponse(@NotNull IHTTPResponse response, int code, @Nullable String body, @NotNull String contentType) {
         response.setResponseCode(code);

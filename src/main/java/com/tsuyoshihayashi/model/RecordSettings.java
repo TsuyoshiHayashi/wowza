@@ -34,9 +34,9 @@ public final class RecordSettings {
     private final @NotNull String hash;
     private final @NotNull String hash2;
     private final @NotNull String referer;
-    private final @Nullable String title;
-    private final @Nullable String comment;
-    private final @Nullable String action;
+    private @Nullable String title;
+    private @Nullable String comment;
+    private @Nullable String action;
 
     /**
      * Create an instance from JSON response

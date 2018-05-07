@@ -1,6 +1,6 @@
 package com.tsuyoshihayashi.wowza;
 
-import com.tsuyoshihayashi.model.RecordSettings;
+import com.tsuyoshihayashi.api.RecordSettingsEndpoint;
 import com.wowza.wms.application.ApplicationInstance;
 import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
@@ -11,8 +11,7 @@ import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.vhost.IVHost;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
+import org.jetbrains.annotations.Nullable;
 
 import static com.tsuyoshihayashi.wowza.StreamConstants.RECORD_SETTINGS_KEY;
 
@@ -31,11 +30,32 @@ public final class RecorderControl extends Control {
     private static final String STREAM_PARAMETER_NAME = "s";
     private static final String ACTION_START = "start";
     private static final String ACTION_STOP = "stop";
+    private static final String TITLE_PARAMETER_NAME = "title";
+    private static final String COMMENT_PARAMETER_NAME = "comment";
+    private static final String TEXT_ACTION_PARAMETER_NAME = "act";
+
+    private static final String API_ENDPOINT_KEY = "apiEndpoint";
+    private static final String UPLOAD_REFERER_KEY = "uploadReferer";
 
     private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(RecorderControl.class);
 
+    private @Nullable RecordSettingsEndpoint recordSettingsEndpoint;
+
+    private @NotNull RecordSettingsEndpoint getRecordSettingsEndpoint(IVHost host) {
+        if (recordSettingsEndpoint == null) {
+            val hostProperties = host.getProperties();
+            val apiEndpoint = hostProperties.getPropertyStr(API_ENDPOINT_KEY);
+            val uploadReferer = hostProperties.getPropertyStr(UPLOAD_REFERER_KEY);
+            recordSettingsEndpoint = new RecordSettingsEndpoint(apiEndpoint, uploadReferer);
+        }
+
+        return recordSettingsEndpoint;
+    }
+
     @Override
     public void onHTTPRequest(IVHost host, IHTTPRequest request, IHTTPResponse response) {
+        logRequest(request, logger);
+
         // Ensure that this is a GET request
         if (!"GET".equals(request.getMethod())) {
             writeBadRequestResponse(response);
@@ -72,17 +92,17 @@ public final class RecorderControl extends Control {
             return;
         }
 
-        // Ensure that the stream has record settings information
-        val properties = stream.getProperties();
-        val settings = (RecordSettings) properties.getProperty(RECORD_SETTINGS_KEY);
-        if (settings == null) {
-            logger.warn(String.format("No record settings for %s", streamName));
-            writeResponse(response, 404, "No record settings for stream");
-            return;
-        }
-
         switch (action) {
             case ACTION_START:
+                // Get recent record settings info
+                val title = request.getParameter(TITLE_PARAMETER_NAME);
+                val comment = request.getParameter(COMMENT_PARAMETER_NAME);
+                val textAction = request.getParameter(TEXT_ACTION_PARAMETER_NAME);
+
+                val settings = getRecordSettingsEndpoint(host).getRecordSettings(stream, title, comment, textAction);
+                val streamProperties = stream.getProperties();
+                streamProperties.setProperty(RECORD_SETTINGS_KEY, settings);
+
                 // Create stream recorder parameters from the settings
                 val parameters = new StreamRecorderParameters(instance);
                 parameters.fileFormat = IStreamRecorderConstants.FORMAT_MP4;
