@@ -20,6 +20,8 @@ import java.util.Optional;
 import static com.tsuyoshihayashi.model.RecordSettings.fromJSON;
 
 /**
+ * Record settings API endpoint
+ *
  * @author Alexey Donov
  */
 public final class RecordSettingsEndpoint extends Endpoint {
@@ -82,6 +84,7 @@ public final class RecordSettingsEndpoint extends Endpoint {
         val textAction = Optional.ofNullable(cameraInfo)
             .map(CameraInfo::getTextAction)
             .map(TextAction::toString)
+            .map(String::toLowerCase)
             .orElse(null);
 
         val title = Optional.ofNullable(cameraInfo)

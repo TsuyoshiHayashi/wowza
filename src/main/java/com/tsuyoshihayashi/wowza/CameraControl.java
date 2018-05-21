@@ -92,7 +92,7 @@ public final class CameraControl extends Control {
                     TextAction textAction = null;
                     if (textActionString != null && !textActionString.isEmpty()) {
                         try {
-                            textAction = TextAction.valueOf(textActionString);
+                            textAction = TextAction.valueOf(textActionString.toUpperCase());
                         } catch (IllegalArgumentException ignore) {
                             // No op
                         }
