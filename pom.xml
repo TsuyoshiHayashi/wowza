@@ -24,7 +24,7 @@
                 <deploy.remote.host>202.231.198.247</deploy.remote.host>
                 <deploy.remote.port>5022</deploy.remote.port>
                 <deploy.key.path>~/.ssh/lduser01.key</deploy.key.path>
-                <deploy.key.passphrase>eicooSie3Foa</deploy.key.passphrase>
+                <deploy.key.passphrase>${env.SSH_PASS}</deploy.key.passphrase>
             </properties>
         </profile>
         <profile>
@@ -33,7 +33,7 @@
                 <deploy.remote.host>202.231.198.247</deploy.remote.host>
                 <deploy.remote.port>5022</deploy.remote.port>
                 <deploy.key.path>~/.ssh/id_rsa</deploy.key.path>
-                <deploy.key.passphrase>eicooSie3Foa</deploy.key.passphrase>
+                <deploy.key.passphrase>${env.SSH_PASS}</deploy.key.passphrase>
             </properties>
         </profile>
     </profiles>
