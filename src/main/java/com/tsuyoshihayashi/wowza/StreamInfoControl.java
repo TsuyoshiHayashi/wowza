@@ -45,10 +45,12 @@ public final class StreamInfoControl extends Control {
         obj.put("video_bitrate", stream.getPublishBitrateVideo());
         obj.put("audio_bitrate", stream.getPublishBitrateAudio());
 
-        // adding recording state to info
+        // check recording status and state
         IApplicationInstance instance = host.getApplication("live").getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME);
         IStreamRecorder recorder = host.getLiveStreamRecordManager().getRecorder(instance, stream.getName());
-        String state = recorder != null ? recorder.getRecorderStateString() : "Stream is not recording";
+        boolean status = recorder != null && recorder.getRecorderState() == 2;
+        obj.put("is_recording", status);
+        String state = recorder != null ? recorder.getRecorderStateString() : "Not recording";
         obj.put("recorder_state", state);
 
         return obj;
