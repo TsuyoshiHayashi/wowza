@@ -1,8 +1,10 @@
 package com.tsuyoshihayashi.wowza;
 
 import com.wowza.wms.application.ApplicationInstance;
+import com.wowza.wms.application.IApplicationInstance;
 import com.wowza.wms.http.IHTTPRequest;
 import com.wowza.wms.http.IHTTPResponse;
+import com.wowza.wms.livestreamrecord.manager.IStreamRecorder;
 import com.wowza.wms.logging.WMSLogger;
 import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.stream.IMediaStream;
@@ -37,11 +39,17 @@ public final class StreamInfoControl extends Control {
      * @return JSON object
      */
     @SuppressWarnings("unchecked")
-    private @NotNull JSONObject streamInfo(@NotNull IMediaStream stream) {
+    private @NotNull JSONObject streamInfo(@NotNull IMediaStream stream, @NotNull IVHost host) {
         val obj = new JSONObject();
         obj.put("total_bitrate", stream.getPublishBitrateAudio() + stream.getPublishBitrateVideo());
         obj.put("video_bitrate", stream.getPublishBitrateVideo());
         obj.put("audio_bitrate", stream.getPublishBitrateAudio());
+
+        // adding recording state to info
+        IApplicationInstance instance = host.getApplication("live").getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME);
+        IStreamRecorder recorder = host.getLiveStreamRecordManager().getRecorder(instance, stream.getName());
+        String state = recorder != null ? recorder.getRecorderStateString() : "Stream is not recording";
+        obj.put("recorder_state", state);
 
         return obj;
     }
@@ -68,7 +76,7 @@ public final class StreamInfoControl extends Control {
             val result = Optional.ofNullable(host.getApplication("live"))
                 .map(application -> application.getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME))
                 .map(instance -> instance.getStreams().getStream(streamName))
-                .map(this::streamInfo)
+                .map(stream -> streamInfo(stream, host))
                 .map(JSONObject::toString)
                 .orElse(null);
 
