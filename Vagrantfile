@@ -21,5 +21,5 @@ Vagrant.configure(2) do |config|
 
     config.vm.synced_folder '.', '/home/vagrant/recorduploader', :mount_options => %w(dmode=775 fmode=664)
 
-    config.vm.provision :shell, :name => 'vagrant-maven.ssh', :args => ['3.5.0'], :path => 'https://bitbucket.org/!api/2.0/snippets/hwdmedia/aKMeA/files/vagrant-maven.sh'
+    config.vm.provision :shell, :name => 'vagrant-maven.ssh', :args => ['3.5.3'], :path => 'https://bitbucket.org/!api/2.0/snippets/hwdmedia/aKMeA/files/vagrant-maven.sh'
 end
