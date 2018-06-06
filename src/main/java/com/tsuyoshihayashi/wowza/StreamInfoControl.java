@@ -29,6 +29,13 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public final class StreamInfoControl extends Control {
     private static final String STREAM_NAME_PARAMETER_NAME = "s";
 
+    private static final String TOTAL_BITRATE = "total_bitrate";
+    private static final String VIDEO_BITRATE = "video_bitrate";
+    private static final String AUDIO_BITRATE = "audio_bitrate";
+    private static final String IS_RECORDING = "is_recording";
+    private static final String RECORDER_STATE = "recorder_state";
+    private static final String NOT_RECORDING_RECORDER_STATE = "Not recording";
+
     private final @NotNull WMSLogger logger = WMSLoggerFactory.getLogger(StreamInfoControl.class);
 
     /**
@@ -41,17 +48,34 @@ public final class StreamInfoControl extends Control {
     @SuppressWarnings("unchecked")
     private @NotNull JSONObject streamInfo(@NotNull IMediaStream stream, @NotNull IVHost host) {
         val obj = new JSONObject();
-        obj.put("total_bitrate", stream.getPublishBitrateAudio() + stream.getPublishBitrateVideo());
-        obj.put("video_bitrate", stream.getPublishBitrateVideo());
-        obj.put("audio_bitrate", stream.getPublishBitrateAudio());
+        obj.put(TOTAL_BITRATE, stream.getPublishBitrateAudio() + stream.getPublishBitrateVideo());
+        obj.put(VIDEO_BITRATE, stream.getPublishBitrateVideo());
+        obj.put(AUDIO_BITRATE, stream.getPublishBitrateAudio());
 
         // check recording status and state
         IApplicationInstance instance = host.getApplication("live").getAppInstance(ApplicationInstance.DEFAULT_APPINSTANCE_NAME);
         IStreamRecorder recorder = host.getLiveStreamRecordManager().getRecorder(instance, stream.getName());
         boolean status = recorder != null && recorder.getRecorderState() == 2;
-        obj.put("is_recording", status);
-        String state = recorder != null ? recorder.getRecorderStateString() : "Not recording";
-        obj.put("recorder_state", state);
+        obj.put(IS_RECORDING, status);
+        String state = recorder != null ? recorder.getRecorderStateString() : NOT_RECORDING_RECORDER_STATE;
+        obj.put(RECORDER_STATE, state);
+
+        return obj;
+    }
+
+    /**
+     * Create an empty JSON
+     *
+     * @return JSON object
+     */
+    @SuppressWarnings("unchecked")
+    private @NotNull JSONObject emptyStreamInfo() {
+        val obj = new JSONObject();
+        obj.put(TOTAL_BITRATE, false);
+        obj.put(VIDEO_BITRATE, false);
+        obj.put(AUDIO_BITRATE, false);
+        obj.put(IS_RECORDING, false);
+        obj.put(RECORDER_STATE, NOT_RECORDING_RECORDER_STATE);
 
         return obj;
     }
@@ -80,7 +104,7 @@ public final class StreamInfoControl extends Control {
                 .map(instance -> instance.getStreams().getStream(streamName))
                 .map(stream -> streamInfo(stream, host))
                 .map(JSONObject::toString)
-                .orElse(null);
+                .orElse(emptyStreamInfo().toJSONString());
 
             // Send the object to the client
             writeResponse(response, 200, result, APPLICATION_JSON);
